@@ -1,0 +1,9 @@
+{
+  "name": "jamba-plugin",
+  "description": "Jamba's library of Claude Code capabilities: skills, agents, hooks, monitors, and MCP servers.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Yassine Reguigui",
+    "email": "yassinereguigui@gmail.com"
+  }
+}
