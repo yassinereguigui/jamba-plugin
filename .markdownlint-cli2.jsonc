@@ -1,0 +1,18 @@
+{
+  // Lint markdown we author. The vendored skill trees (api-design,
+  // continuous-delivery) are external content and are intentionally excluded —
+  // we don't rewrite upstream docs to satisfy our lint rules.
+  "globs": ["**/*.md"],
+  "ignores": [
+    "skills/api-design/**",
+    "skills/continuous-delivery/**",
+    "node_modules/**",
+    ".git/**"
+  ],
+  "config": {
+    "default": true,
+    "MD013": false, // line length — prose wraps naturally
+    "MD060": false, // table pipe spacing — compact tables are fine
+    "MD004": false  // list marker style — dash or plus both fine
+  }
+}

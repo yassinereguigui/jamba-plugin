@@ -5,14 +5,17 @@
 .DEFAULT_GOAL := help
 PLUGIN_DIR := .
 
-.PHONY: help check validate json frontmatter hygiene
+.PHONY: help check validate json frontmatter hygiene markdown
+
+# Pinned for a deterministic gate; bump deliberately.
+MDLINT_VERSION := 0.23.1
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| sort \
 		| awk 'BEGIN {FS = ":.*?## "} {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
-check: validate json frontmatter hygiene ## Run the full deterministic gate
+check: validate json frontmatter hygiene markdown ## Run the full deterministic gate
 
 validate: ## Structural gate: claude plugin validate --strict
 	claude plugin validate $(PLUGIN_DIR) --strict
@@ -30,3 +33,6 @@ frontmatter: ## Skills/agents declare required frontmatter
 
 hygiene: ## No OS/editor junk files tracked
 	@./scripts/check-hygiene.sh
+
+markdown: ## Lint authored markdown (vendored skills excluded)
+	npx --yes markdownlint-cli2@$(MDLINT_VERSION)

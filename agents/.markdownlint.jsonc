@@ -1,0 +1,4 @@
+{
+  // Agent files are system prompts, not documents — no first-line H1 expected.
+  "MD041": false
+}

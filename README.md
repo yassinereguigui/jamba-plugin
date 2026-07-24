@@ -5,7 +5,7 @@ packaged as a single Claude Code plugin.
 
 ## Layout
 
-```
+```text
 jamba-plugin/
 ├── .claude-plugin/plugin.json   # manifest (name, version, author)
 ├── skills/api-design/           # API design patterns (multi-file, references/)
@@ -32,7 +32,7 @@ claude --plugin-dir ./jamba-plugin
 
 After editing components, reload without restarting:
 
-```
+```text
 /reload-plugins
 ```
 
@@ -54,8 +54,8 @@ have real components.
 
 ## References
 
-- Create plugins: https://code.claude.com/docs/en/plugins
-- Plugins reference: https://code.claude.com/docs/en/plugins-reference
-- Skills: https://code.claude.com/docs/en/skills
-- Subagents: https://code.claude.com/docs/en/sub-agents
-- Hooks: https://code.claude.com/docs/en/hooks
+- [Create plugins](https://code.claude.com/docs/en/plugins)
+- [Plugins reference](https://code.claude.com/docs/en/plugins-reference)
+- [Skills](https://code.claude.com/docs/en/skills)
+- [Subagents](https://code.claude.com/docs/en/sub-agents)
+- [Hooks](https://code.claude.com/docs/en/hooks)
