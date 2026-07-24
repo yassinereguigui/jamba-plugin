@@ -23,6 +23,7 @@ Event occurs ──────→ Event Store ──→ Delivery Worker ──�
 ```
 
 **Why the event store matters:** Never deliver webhooks synchronously in the request handler that triggered the event. This creates:
+
 - Latency: your API response waits for the webhook delivery
 - Coupling: consumer downtime blocks your API
 - Missing retry: if delivery fails, the event is lost
@@ -34,12 +35,14 @@ Use an event store (database table, Kafka, SQS) and a separate delivery worker.
 **At-least-once delivery** is the practical guarantee for webhooks. Exactly-once is achievable only if consumers are idempotent.
 
 **Stripe's delivery implementation:**
+
 - 72-hour retry window
 - Exponential backoff: 1s, 5s, 30s, 5min, 30min, 2h, 5h (then 8h intervals)
 - Marks endpoint as disabled after 72 hours of consecutive failures
 - Sends alert emails to account owners when delivery failures begin
 
 **GitHub's delivery implementation:**
+
 - 5 retry attempts over ~24 hours
 - Provides delivery logs in the UI (last 30 days)
 - Manual redelivery option
@@ -105,6 +108,7 @@ async function deliverWebhook(delivery: WebhookDelivery): Promise<void> {
 Consumers must verify that webhooks actually came from you, not an attacker:
 
 **Signing (sender side):**
+
 ```typescript
 import { createHmac } from 'crypto';
 
@@ -124,6 +128,7 @@ headers['Webhook-Signature'] = `v1=${signature}`;
 ```
 
 **Verification (consumer side):**
+
 ```typescript
 function verifyWebhookSignature(
   rawBody: string,
@@ -206,6 +211,7 @@ app.post('/webhooks', async (req, res) => {
 ### Fat vs. Thin Payloads
 
 **Fat payload:** Webhook includes all relevant data
+
 ```json
 {
   "type": "order.completed",
@@ -220,6 +226,7 @@ app.post('/webhooks', async (req, res) => {
 ```
 
 **Thin payload (reference model):** Webhook includes only the event type and IDs
+
 ```json
 {
   "type": "order.completed",
@@ -230,6 +237,7 @@ app.post('/webhooks', async (req, res) => {
 ```
 
 **Trade-offs:**
+
 - **Fat:** Consumer doesn't need to make additional API calls; works well for high-volume processing; more bandwidth
 - **Thin:** Smaller payloads; consumer always has current data (events can arrive out of order); consumer can batch lookups; simpler to evolve the event payload independently of the API response format
 
@@ -283,6 +291,7 @@ data: {"type":"heartbeat"}\n
 ```
 
 **Event format fields:**
+
 - `event:` — event type (default: "message")
 - `data:` — payload (can be multi-line, each line prefixed with `data:`)
 - `id:` — last event ID (sent by client in `Last-Event-ID` on reconnect)
@@ -395,6 +404,7 @@ CloudEvents is a CNCF specification for event envelope format — a common struc
 ```
 
 **Standard extension attributes:**
+
 - `traceparent`, `tracestate`: W3C Trace Context (enables distributed tracing across event flows)
 - `subject`: Identifies the subject of the event within the source
 - `schemaurl`: Reference to the schema describing the data
@@ -435,17 +445,20 @@ HTTP/1.1 200 OK
 Events must be backward-compatible — consumers built against v1 events should still work when the producer emits v2:
 
 **Safe changes:**
+
 - Add new optional fields to event data
 - Add new event types
 - Change human-readable descriptions
 
 **Breaking changes:**
+
 - Remove fields from event data
 - Change field types
 - Rename fields
 - Remove event types (consumers may have registered for them)
 
 **Avro for event schemas (Kafka):**
+
 ```json
 {
   "type": "record",
@@ -461,6 +474,7 @@ Events must be backward-compatible — consumers built against v1 events should 
 ```
 
 Avro with a Schema Registry (Confluent, AWS Glue) enforces compatibility rules:
+
 - `BACKWARD`: New schema can read data written by old schema (consumers can upgrade)
 - `FORWARD`: Old schema can read data written by new schema (producers can upgrade)
 - `FULL`: Both directions

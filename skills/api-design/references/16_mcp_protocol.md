@@ -9,6 +9,7 @@ MCP (Model Context Protocol) is an open protocol by Anthropic (November 2024) fo
 ## What Problem MCP Solves
 
 Without MCP, each LLM/agent framework defines its own way to call external tools:
+
 - OpenAI has function calling definitions
 - Anthropic has tool_use blocks
 - LangChain has its own tool interface
@@ -40,6 +41,7 @@ MCP Client (e.g., Claude Desktop)
 ```
 
 Use stdio for:
+
 - Local filesystem tools
 - Local database connections
 - Development tooling
@@ -62,11 +64,13 @@ The server provides a single HTTP endpoint (e.g., `/mcp`) that handles both POST
 ### Why SSE Was Deprecated
 
 The original HTTP+SSE transport required:
+
 1. Client GET `/sse` to establish SSE connection
 2. Server sends `endpoint` event with a URL
 3. Client POST to that URL for actual calls
 
 Problems:
+
 - State management complexity (SSE connection and POST requests are separate)
 - Session tracking required server-side state
 - Proxies and load balancers that don't support SSE broke the model
@@ -132,6 +136,7 @@ MCP uses JSON-RPC 2.0 as its message format:
 Executable actions that the LLM can invoke. The primary primitive for "doing things."
 
 **Tool list:**
+
 ```json
 // Client → Server
 { "jsonrpc": "2.0", "id": 2, "method": "tools/list" }
@@ -167,6 +172,7 @@ Executable actions that the LLM can invoke. The primary primitive for "doing thi
 ```
 
 **Tool execution:**
+
 ```json
 // Client → Server
 {
@@ -194,6 +200,7 @@ Executable actions that the LLM can invoke. The primary primitive for "doing thi
 ```
 
 **`isError: true` pattern:**
+
 ```json
 {
   "result": {
@@ -253,6 +260,7 @@ Read-only data that the MCP server exposes. Think of resources as files, databas
 ```
 
 **Resource subscriptions:** Clients can subscribe to resource change notifications:
+
 ```json
 { "method": "resources/subscribe", "params": { "uri": "file:///config.yaml" } }
 // Server sends: { "method": "notifications/resources/updated", "params": { "uri": "..." } }
@@ -467,6 +475,7 @@ Remote MCP servers use OAuth 2.1 with PKCE (mandatory as of November 2025 spec):
 The Obsidian Security research found that many MCP servers failed to properly bind OAuth state to user sessions, enabling CSRF-style authorization code interception. The Asana incident (June 2025) resulted in customer data cross-contamination between MCP instances.
 
 **Mitigation pattern:**
+
 ```typescript
 // Server: validate OAuth state parameter is session-bound
 app.get('/oauth/callback', (req, res) => {
@@ -506,6 +515,7 @@ npx openapi-mcp-generator openapi.yaml --output mcp-server.ts
 This generates an MCP server where each OpenAPI operation becomes an MCP tool. The tool descriptions come from OpenAPI `summary` and `description` fields — which is why high-quality OpenAPI descriptions matter more now than ever before.
 
 **When MCP adds genuine value over function calling:**
+
 - **Multi-model portability:** Write once, deploy across Claude, GPT, Gemini
 - **Resource sharing:** MCP resources provide data that persists across tool calls
 - **Prompt reuse:** Standardized interaction templates shared across agent systems
@@ -516,6 +526,7 @@ This generates an MCP server where each OpenAPI operation becomes an MCP tool. T
 ## Ecosystem Maturity (2025)
 
 **Client support:**
+
 - Claude Desktop: Full MCP support (the reference client)
 - VS Code Copilot: MCP support added 2025
 - Cursor: Full MCP support
@@ -524,6 +535,7 @@ This generates an MCP server where each OpenAPI operation becomes an MCP tool. T
 - Gemini: MCP support added 2025
 
 **Server ecosystem:**
+
 - 20,000+ community MCP servers (GitHub, npm, pip)
 - Official MCP servers: Filesystem, Git, GitHub, Postgres, SQLite, Fetch, Memory
 - Commercial: Cloudflare Workers as MCP hosting, Vercel, AWS Lambda
@@ -531,6 +543,7 @@ This generates an MCP server where each OpenAPI operation becomes an MCP tool. T
 **Discovery problem:** With 20,000+ servers, discoverability is the bottleneck. PulseMCP indexes 5,500+ servers; the ecosystem lacks a canonical "npm for MCP servers." The Linux Foundation agentic AI initiative is working on this.
 
 **Production considerations (from real-world deployments):**
+
 - Session state in stateless HTTP environments (Streamable HTTP) requires external session store (Redis)
 - Rate limiting MCP tool calls independently from HTTP endpoints
 - Observability: trace MCP tool calls with the same traceId as the HTTP request that triggered the AI agent

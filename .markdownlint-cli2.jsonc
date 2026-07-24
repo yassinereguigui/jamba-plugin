@@ -1,18 +1,21 @@
 {
-  // Lint markdown we author. The vendored skill trees (api-design,
-  // continuous-delivery) are external content and are intentionally excluded —
-  // we don't rewrite upstream docs to satisfy our lint rules.
+  // Lint all authored markdown. The two skills are being migrated to
+  // strict-clean markdown; each stays in `ignores` (a ratchet) only until it
+  // is fully green, then it is removed here and enforced permanently. This is
+  // progressive enforcement, not a permanent exclusion.
   "globs": ["**/*.md"],
   "ignores": [
-    "skills/api-design/**",
-    "skills/continuous-delivery/**",
     "node_modules/**",
-    ".git/**"
+    ".git/**",
+    "skills/api-design/**",        // ratchet: migrating (formatting done, code languages pending)
+    "skills/continuous-delivery/**" // ratchet: migrating (needs code-fencing first)
   ],
   "config": {
     "default": true,
     "MD013": false, // line length — prose wraps naturally
     "MD060": false, // table pipe spacing — compact tables are fine
-    "MD004": false  // list marker style — dash or plus both fine
+    "MD004": false, // list marker style — dash or plus both fine
+    "MD024": { "siblings_only": true }, // repeated sub-headings under different parents are fine
+    "MD025": { "front_matter_title": "" } // frontmatter `title` is not a body heading
   }
 }

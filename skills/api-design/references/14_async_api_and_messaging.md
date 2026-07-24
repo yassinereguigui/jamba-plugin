@@ -53,6 +53,7 @@ Consumer Group B (analytics):
 A traditional message broker with AMQP. Push-based (server pushes to consumers).
 
 **AMQP concepts:**
+
 ```
 Publisher → Exchange → Binding → Queue → Consumer
               │
@@ -92,12 +93,14 @@ channel.basic_consume(queue='order-processing', on_message_callback=on_message)
 ### AWS SQS and SNS
 
 **SQS (Simple Queue Service):** Point-to-point queue. Each message delivered to one consumer. Two types:
+
 - Standard: At-least-once delivery, best-effort ordering, unlimited throughput
 - FIFO: Exactly-once delivery, strict ordering, 3,000 msg/s throughput
 
 **SNS (Simple Notification Service):** Pub/sub fanout. One message published → delivered to all subscribers (email, SMS, HTTP, SQS, Lambda).
 
 **The SNS→SQS fanout pattern:**
+
 ```
 SNS Topic: order-events
 ├── SQS Queue: order-processing
@@ -156,6 +159,7 @@ kafka.publish('order.shipped', { orderId });  // Could fail; order updated but e
 ```
 
 **The Outbox Pattern:**
+
 ```sql
 -- Application inserts event record in same transaction as domain change
 BEGIN;
@@ -167,6 +171,7 @@ COMMIT;
 ```
 
 A separate "outbox relay" process reads the outbox table and publishes events to Kafka/RabbitMQ:
+
 ```python
 # Outbox relay (Debezium CDC or custom poller)
 def relay_outbox():
@@ -183,6 +188,7 @@ def relay_outbox():
 Long-running business transactions spanning multiple services, with compensation for failures.
 
 **Choreography-based Saga (event-driven):**
+
 ```
 Order Service        Inventory Service     Payment Service
      │                     │                     │
@@ -197,6 +203,7 @@ Order Service        Inventory Service     Payment Service
 
 **Orchestration-based Saga:**
 A central saga orchestrator drives the sequence, calling each service and handling failures:
+
 ```python
 class OrderSagaOrchestrator:
     async def execute(self, order_id: str):
@@ -217,6 +224,7 @@ class OrderSagaOrchestrator:
 ```
 
 **Choreography vs. Orchestration:**
+
 - Choreography: No single point of control; services react to events. Harder to understand the overall flow; better autonomy.
 - Orchestration: Clear central logic; easier to trace and debug; central coordinator becomes a coupling point.
 

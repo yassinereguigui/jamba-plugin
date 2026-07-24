@@ -44,6 +44,7 @@ OTel Collector (optional but recommended)
 ### Why Use the Collector
 
 The OTel Collector sits between your application and observability backends:
+
 - **Vendor independence:** Applications export to Collector; Collector exports to Datadog, Jaeger, Prometheus, CloudWatch — swap backends without redeployment
 - **Sampling:** The Collector can make tail-based sampling decisions (keep 100% of error traces, sample 1% of success traces) after seeing the full trace
 - **Buffering:** Handles backpressure; applications are not blocked if backend is slow
@@ -52,6 +53,7 @@ The OTel Collector sits between your application and observability backends:
 ### Instrumentation
 
 **Manual instrumentation (Node.js example):**
+
 ```typescript
 import { trace, SpanStatusCode, context } from '@opentelemetry/api';
 
@@ -87,6 +89,7 @@ async function createOrder(orderData: CreateOrderInput): Promise<Order> {
 ```
 
 **Auto-instrumentation (Node.js):**
+
 ```typescript
 // Must be loaded before application code
 import { NodeSDK } from '@opentelemetry/sdk-node';
@@ -138,6 +141,7 @@ Order API                    User Service              Payment Service
 ```
 
 Each span contains:
+
 - `trace_id`: Same for all spans in the request chain
 - `span_id`: Unique to this span
 - `parent_span_id`: Reference to parent span
@@ -158,6 +162,7 @@ tracestate: vendor1=value1,vendor2=value2
 ```
 
 **`traceparent` format:** `version-trace_id-parent_span_id-flags`
+
 - `00`: Version (always 00)
 - `7b05aff8...`: 128-bit trace ID (hex)
 - `6f84d0d8...`: 64-bit parent span ID (hex)
@@ -179,6 +184,7 @@ Sampling is essential — 100% trace capture is expensive at high volume.
 | Adaptive/dynamic | Adjust rate based on volume | Auto-scales sampling |
 
 **Tail-based sampling in OTel Collector:**
+
 ```yaml
 # otel-collector-config.yaml
 processors:
@@ -216,6 +222,7 @@ processors:
 ### RED Method (Tom Wilkie)
 
 More actionable for API services specifically:
+
 - **Rate:** Requests per second
 - **Errors:** Error rate (per second or percentage)
 - **Duration:** Latency distributions (p50, p95, p99)
@@ -304,12 +311,14 @@ Every log entry should be a JSON object with consistent fields:
 ### What NOT to Log
 
 **PII (personally identifiable information):**
+
 - Email addresses, phone numbers, names
 - IP addresses (in many GDPR interpretations)
 - Credit card numbers (NEVER — PCI violation)
 - SSN, passport numbers
 
 **Security-sensitive data:**
+
 - Passwords (even wrong ones from failed logins)
 - API keys and secrets
 - Session tokens and JWTs (log the `jti` claim or token ID instead)
@@ -420,6 +429,7 @@ slos:
 SLO = 99.9% availability → Error budget = 0.1% = 43.2 minutes/month allowed downtime
 
 **Error budget policy:**
+
 - Budget > 50%: Ship freely, innovate, take calculated risks
 - Budget 25-50%: Slow down, add testing before risky changes
 - Budget < 25%: Freeze non-essential releases, focus on reliability
@@ -434,17 +444,20 @@ Error budget is the mechanism that aligns product teams (want to ship) and SRE t
 Beyond operational observability, API analytics surfaces business intelligence:
 
 **Consumer breakdown:**
+
 - Which API consumers drive the most traffic?
 - Which consumers are calling deprecated endpoints?
 - Which consumers are getting the most errors?
 
 **Usage patterns:**
+
 - Hourly/daily request volume trends
 - Most-called endpoints
 - Endpoint error rates by endpoint type
 - Geographic distribution of consumers
 
 **Gateway analytics tools:**
+
 - **Kong Enterprise:** Built-in Vitals dashboard (Grafana-based)
 - **Apigee:** Extensive analytics — consumer analytics, latency percentiles, SLO dashboards
 - **AWS API Gateway:** CloudWatch dashboards (basic) + X-Ray (traces)
@@ -457,16 +470,19 @@ Beyond operational observability, API analytics surfaces business intelligence:
 ### Self-Hosted Options
 
 **EFK Stack:**
+
 - **Fluentd/Fluent Bit:** Log collector (daemonset in Kubernetes)
 - **Elasticsearch:** Storage and search
 - **Kibana:** UI for search and dashboards
 
 **LMG Stack (more modern):**
+
 - **Grafana Alloy (successor to Promtail):** Log collector
 - **Loki:** Log storage (label-indexed, not full-text like Elasticsearch — cheaper)
 - **Grafana:** Dashboards
 
 **Loki vs. Elasticsearch for APIs:**
+
 - Loki is significantly cheaper (stores raw logs compressed; only indexes labels)
 - Elasticsearch is more powerful for ad-hoc full-text search
 - For structured JSON logs where you query by known fields (requestId, traceId, status), Loki is usually sufficient and much less expensive to operate

@@ -9,6 +9,7 @@ An API gateway handles request routing, protocol translation, and policy enforce
 ## API Gateway vs. API Management Platform
 
 **What a gateway does:**
+
 - Route incoming requests to backend services
 - Enforce authentication/authorization (JWT validation, API key check)
 - Rate limiting and throttling
@@ -18,6 +19,7 @@ An API gateway handles request routing, protocol translation, and policy enforce
 - Logging and basic metrics
 
 **What an API management platform adds:**
+
 - Developer portal (documentation, API key self-service, sandbox)
 - API product/plan management (who can access what)
 - Advanced analytics (per-consumer usage, SLO tracking)
@@ -79,6 +81,7 @@ plugins:
 ### Declarative Configuration (decK)
 
 decK allows managing Kong configuration as code:
+
 ```bash
 # Deploy config
 deck gateway sync kong.yaml
@@ -127,6 +130,7 @@ AWS offers three API gateway products with very different use cases:
 ### REST API vs. HTTP API
 
 **Choose REST API when:**
+
 - Need usage plans (rate limits per API key)
 - Need edge cache (API GW built-in caching)
 - Need request/response validation (model-based)
@@ -135,6 +139,7 @@ AWS offers three API gateway products with very different use cases:
 - Need complex request transformation
 
 **Choose HTTP API when:**
+
 - Lower latency requirements (HTTP API is ~60% faster on p99)
 - Lower cost (significantly cheaper per million requests)
 - Simple JWT authorizer (built-in — no Lambda authorizer needed)
@@ -267,21 +272,25 @@ Premium tier's multi-region HA can exceed $10,000/month — plan accordingly.
 Google Cloud's enterprise API management platform. Acquired from Apigee in 2016.
 
 **Apigee's differentiators:**
+
 - **Analytics depth:** Pre-built dashboards for API usage, latency, error rates, consumer breakdown — far beyond basic metrics
 - **Monetization:** Built-in billing integration (Stripe), rate plans, developer packages
 - **Developer Portal:** Drupal-based or integrated portal with API catalog, sandbox, key management
 - **Shared Flows:** Reusable policy flows shared across API proxies (like middleware middleware)
 
 **Apigee X vs. Apigee Hybrid:**
+
 - Apigee X: Fully Google Cloud-managed control plane; data plane runs in your GCP project
 - Apigee Hybrid: Control plane in Google Cloud; data plane runs on your own Kubernetes (on-prem or any cloud)
 
 **When to choose Apigee:**
+
 - Google Cloud shop with complex API monetization requirements
 - Large enterprise with many external API consumers needing advanced analytics
 - Organizations with existing Apigee investment
 
 **When not to choose Apigee:**
+
 - AWS or Azure primary cloud (vendor mismatch adds complexity)
 - Small to medium teams (cost and operational complexity are high)
 - Internal-only APIs (Apigee's strengths are for external consumer management)
@@ -291,12 +300,14 @@ Google Cloud's enterprise API management platform. Acquired from Apigee in 2016.
 ## Service Mesh vs. API Gateway
 
 The "north-south vs. east-west" framing:
+
 - **North-south traffic:** External client → your infrastructure (API Gateway territory)
 - **East-west traffic:** Service A → Service B within your infrastructure (Service Mesh territory)
 
 **Why the distinction matters:**
 
 An API gateway handles **product concerns** at the edge:
+
 - API key management (who are you as a consumer?)
 - Rate limits per subscription
 - Developer portal and documentation
@@ -304,6 +315,7 @@ An API gateway handles **product concerns** at the edge:
 - API versioning
 
 A service mesh handles **infrastructure concerns** between services:
+
 - Automatic mTLS between all services
 - Circuit breakers and retries
 - Distributed tracing injection
@@ -387,6 +399,7 @@ spec:
 ```
 
 The Gateway API's role-based model separates concerns:
+
 - Infrastructure admin: manages `GatewayClass` and `Gateway`
 - Platform team: manages routes within their namespace
 - Application team: manages `HTTPRoute`, `GRPCRoute`, etc.
@@ -421,6 +434,7 @@ Capabilities that should live in the gateway, not in application code:
 ### Global Load Balancing
 
 Options:
+
 - **AWS Global Accelerator:** Anycast routing to nearest AWS edge, routes to regional API endpoints
 - **Cloudflare:** DNS-based global routing, API protection, edge caching
 - **Kong Konnect:** Global control plane with regional data planes
@@ -439,6 +453,7 @@ CDN caching at the edge eliminates the majority of API calls for cacheable resou
 ### Data Residency Constraints
 
 GDPR, APAC regulations, and financial regulations may require data to remain in specific regions:
+
 - European user data processed only in EU regions
 - Japanese user data processed only in Japan
 - Health data processed only in regulatory-approved regions

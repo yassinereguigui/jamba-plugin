@@ -34,6 +34,7 @@ API documentation is a product. Its quality directly determines adoption — dev
 ```
 
 **Redoc** remains the choice for APIs that prioritize documentation readability over interactive testing:
+
 ```yaml
 # redocly.yaml
 theme:
@@ -52,6 +53,7 @@ apis:
 Beyond rendering: the source OpenAPI spec quality determines documentation quality.
 
 **Required for every operation:**
+
 ```yaml
 paths:
   /orders/{id}:
@@ -68,6 +70,7 @@ paths:
 ```
 
 **Required for every parameter:**
+
 ```yaml
 parameters:
   - name: id
@@ -83,6 +86,7 @@ parameters:
 ```
 
 **Required for every response:**
+
 ```yaml
 responses:
   '200':
@@ -113,6 +117,7 @@ Multiple named examples (not just `example`) are the most underused OpenAPI feat
 ### AsyncAPI Studio
 
 The official web-based editor and documentation previewer for AsyncAPI specs:
+
 ```
 https://studio.asyncapi.com/?url=https://my-api.com/asyncapi.yaml
 ```
@@ -130,6 +135,7 @@ npm run dev
 ```
 
 EventCatalog supports:
+
 - Visualizing event flows as dependency graphs
 - Documenting which services own which events
 - Versioned event schemas with diff comparison
@@ -142,12 +148,14 @@ EventCatalog supports:
 Documentation stored in version control, reviewed via PRs, deployed via CI/CD.
 
 **Benefits:**
+
 - Docs change with code (same PR)
 - Review process for documentation quality
 - Documentation history via git log
 - Same deployment pipeline as code
 
 **Structure:**
+
 ```
 docs/
 ├── openapi.yaml              # API spec (docs source of truth)
@@ -164,6 +172,7 @@ docs/
 ```
 
 **Documentation site generators:**
+
 - **MkDocs + Material:** Python-based, excellent for API docs, great search
 - **Docusaurus:** React-based, used by Meta projects, excellent for large doc sites
 - **Mintlify:** Commercial, specifically for API docs, used by OpenAI, Anthropic
@@ -202,6 +211,7 @@ Reference documentation answers "what?" Conceptual documentation answers "how?" 
 ### Writing Good Conceptual Documentation
 
 **Good:**
+
 ```markdown
 ## Handling Webhooks
 
@@ -230,6 +240,7 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 ```
 
 **Bad:**
+
 ```markdown
 ## Webhooks
 
@@ -249,6 +260,7 @@ Code samples are the most valuable documentation artifact and the most often bro
 ### Language Coverage
 
 Support the languages your developers actually use. Track analytics on SDK downloads and documentation language tab preferences. Minimum coverage for most developer APIs:
+
 - JavaScript/TypeScript
 - Python
 - Java or Kotlin
@@ -259,12 +271,14 @@ Support the languages your developers actually use. Track analytics on SDK downl
 ### Code Sample Quality Standards
 
 **Every code sample must:**
+
 1. Run without modification (copy-paste executable)
 2. Use realistic, recognizable data (not `fooBarBaz`)
 3. Show error handling (not just the happy path)
 4. Be idiomatic in the target language
 
 **Bad example (common in auto-generated docs):**
+
 ```javascript
 const result = await apiClient.ordersCreate({
   customerId: 'string',  // Wrong: not a string literal
@@ -273,6 +287,7 @@ const result = await apiClient.ordersCreate({
 ```
 
 **Good example:**
+
 ```javascript
 import { Client } from '@example/api-client';
 
@@ -317,6 +332,7 @@ Run code sample tests in CI against the sandbox environment. This catches broken
 ## Documentation Testing
 
 **Link checking (dead links):**
+
 ```yaml
 # GitHub Action for link checking
 - name: Check Links
@@ -327,6 +343,7 @@ Run code sample tests in CI against the sandbox environment. This catches broken
 ```
 
 **OpenAPI spec validation:**
+
 ```bash
 # Validate spec syntax and style
 spectral lint openapi.yaml
@@ -334,6 +351,7 @@ redocly lint openapi.yaml
 ```
 
 **Example request validation:**
+
 ```bash
 # Schemathesis validates that documented examples are valid per schema
 schemathesis run openapi.yaml \
@@ -353,6 +371,7 @@ Internal APIs have different documentation needs:
 - **Service runbooks:** What to do when this service is degraded?
 
 **Internal API doc template:**
+
 ```markdown
 # Orders Service API
 

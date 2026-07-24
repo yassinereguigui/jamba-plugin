@@ -39,6 +39,7 @@ Leonard Richardson's model provides a practical ladder for evaluating "how RESTf
 Statelessness means the server holds no client-session state between requests. Authentication tokens in headers satisfy this — the server reconstructs client context from the token each request. Database state is not "session state." Confusion here leads to incorrect REST criticism.
 
 **Where statelessness creates genuine pain:**
+
 - Multi-step wizards or workflows (must externalize state to client or cache)
 - Streaming/real-time updates (requires SSE or WebSockets, which are stateful)
 - Long-running operations (must poll or use async patterns)
@@ -64,6 +65,7 @@ HATEOAS (Hypermedia As The Engine Of Application State) requires responses to co
 **Who actually implements it:** GitHub's API, PayPal's older API, Amazon Web Services (partially), HAL-using APIs in enterprise Java ecosystems.
 
 **Why it rarely gets adopted:**
+
 1. **No format standard:** HAL, Siren, JSON:API, JSON-LD, Ion — competing hypermedia formats with incompatible client libraries
 2. **Client complexity:** Clients must traverse links rather than hardcode URLs, requiring a hypermedia-aware client library
 3. **Documentation still required:** Even with HATEOAS, developers read docs to understand business context
@@ -94,6 +96,7 @@ query {
 ```
 
 **Structural advantages:**
+
 - **No over-fetching:** Client gets exactly the fields requested
 - **No under-fetching:** One request can traverse the graph to get related data
 - **Introspection:** Schema is queryable at runtime — enables tooling
@@ -106,6 +109,7 @@ The most significant production hazard in GraphQL. When resolving a list of enti
 ```
 query { posts { title author { name } } }
 ```
+
 Without batching: `SELECT * FROM posts` (1 query) + `SELECT * FROM users WHERE id=?` × N (N queries). For 100 posts, this is 101 database queries.
 
 **Solution: DataLoader** — Facebook's batching library. Collects `.load(key)` calls within a single event loop tick, deduplicates, then fires a single batch query. DataLoader is not optional in production GraphQL.
@@ -124,6 +128,7 @@ const authorLoader = new DataLoader(async (authorIds) => {
 GraphQL Federation allows a single GraphQL endpoint (the supergraph) to be backed by multiple services (subgraphs), each owning part of the schema. Apollo Federation 2.0 is the dominant implementation; Mercurius, Wundergraph, and Cosmo are alternatives.
 
 **Architecture:**
+
 ```
                     ┌──────────────┐
 Client ──────────── │ Apollo Router │ ──── Users Subgraph
@@ -132,6 +137,7 @@ Client ──────────── │ Apollo Router │ ──── U
 ```
 
 **Key Federation patterns:**
+
 - **`@key` directive:** Defines primary key for an entity that can be resolved across subgraphs
 - **`@external`/`@requires`:** A subgraph can extend another's type using fields from the original owner
 - **Entity resolution (`__resolveReference`):** Must use DataLoader or performance degrades catastrophically
@@ -141,6 +147,7 @@ Client ──────────── │ Apollo Router │ ──── U
 ### Persisted Queries
 
 Instead of sending the full query document on every request, clients register queries with the server at build time and send only a hash. Benefits:
+
 - **Security:** Servers can reject arbitrary queries (allowlist mode)
 - **Performance:** Smaller payloads, HTTP GET caching becomes possible
 - **Schema evolution:** Server knows exactly what queries exist in production
@@ -161,11 +168,13 @@ POST /graphql HTTP/1.1
 4. **Over-engineering risk:** "Why, after 6 years, I'm over GraphQL" (Bessey, 2024) — GraphQL is excellent for client-driven data fetching (Facebook's original use case: mobile clients with varying screen sizes and data needs). For server-to-server APIs, it adds indirection without proportional benefit.
 
 **GraphQL is a strong fit when:**
+
 - Multiple clients (web/mobile/third-party) with different data requirements consume the same backend
 - Rapid iteration where clients frequently change their data needs
 - Frontend teams own client queries independently of backend teams
 
 **GraphQL is a poor fit when:**
+
 - The API is primarily server-to-server (use gRPC or REST)
 - Simple CRUD with consistent response shapes (REST is sufficient)
 - Teams lack the DataLoader discipline or schema governance maturity
@@ -204,16 +213,19 @@ service UserService {
 1. **Unary RPC:** Single request → single response. Equivalent to a standard HTTP API call.
 
 2. **Server-side streaming:** Client sends one request; server sends a stream of responses. Use case: log tailing, large dataset download, real-time data push.
+
    ```protobuf
    rpc WatchOrders (WatchRequest) returns (stream Order);
    ```
 
 3. **Client-side streaming:** Client sends stream of requests; server sends one response. Use case: file upload, sensor data aggregation.
+
    ```protobuf
    rpc UploadChunks (stream FileChunk) returns (UploadResult);
    ```
 
 4. **Bidirectional streaming:** Both sides stream independently. Use case: real-time collaboration, multiplayer game state, chat.
+
    ```protobuf
    rpc BidirectionalChat (stream Message) returns (stream Message);
    ```
@@ -221,6 +233,7 @@ service UserService {
 ### Protocol Buffers: Backward Compatibility Rules
 
 Protobuf's evolution rules enable schema changes without breaking existing clients:
+
 - **Safe:** Add new optional fields (new field numbers), add new enum values, rename fields (field numbers are what matter in binary encoding)
 - **Unsafe (breaking):** Change a field's type, reuse a field number, change a field from optional to required, delete and reuse a field number without `reserved`
 
@@ -270,6 +283,7 @@ Use case: expose an internal gRPC API externally as REST for browser clients or 
 | Debugging | Hard (binary wire format) | Easy (human-readable) | Medium |
 
 **Practical guidance:**
+
 - Use gRPC for service-to-service communication in polyglot microservices environments where performance matters and teams control both client and server
 - Use REST for public APIs, browser-facing APIs, or teams without protobuf toolchain discipline
 - Use GraphQL when a product team owns both frontend and backend and builds for multiple client types with varying data requirements
@@ -291,6 +305,7 @@ Sec-WebSocket-Version: 13
 ```
 
 **Appropriate use cases:**
+
 - Real-time collaborative features (document editing, cursor sharing)
 - Live data feeds (financial tickers, sports scores, live dashboards)
 - Multiplayer game state
@@ -298,6 +313,7 @@ Sec-WebSocket-Version: 13
 - Pair programming tools
 
 **Infrastructure implications:**
+
 - WebSockets are stateful connections — horizontal scaling requires sticky sessions or a pub/sub broker (Redis Pub/Sub, Kafka) to fan out messages to the correct server holding a connection
 - Load balancers must support WebSocket upgrades (most modern ones do, but check timeout settings)
 - Connection count (not request count) determines server capacity
@@ -306,6 +322,7 @@ Sec-WebSocket-Version: 13
 ### Authentication Over WebSockets
 
 HTTP headers are unavailable after the upgrade. Common patterns:
+
 1. **Query parameter token (suboptimal):** `wss://api.example.com/ws?token=jwt123` — tokens appear in server logs
 2. **First-message auth:** Connection accepted; first message must be `{"type":"auth","token":"..."}` within N seconds or connection is closed
 3. **Ticket-based:** HTTP endpoint issues a short-lived single-use ticket; WebSocket connection presents ticket
@@ -345,12 +362,14 @@ data: {"sku": "ABC-001", "quantity": 0}\n\n
 ```
 
 **Advantages over WebSockets for push-only use cases:**
+
 - Plain HTTP — works through all proxies, load balancers, and CDNs with zero special configuration
 - Automatic reconnection built into the browser `EventSource` API
 - Multiplexed over HTTP/2 (unlike HTTP/1.1 WebSockets which need a separate connection per stream)
 - Significantly simpler server implementation
 
 **Limitations:**
+
 - Unidirectional (server → client only)
 - No binary frames — only UTF-8 text (base64 encoding required for binary)
 - Browser `EventSource` doesn't support custom headers (use query params or initial POST for auth)
@@ -382,11 +401,13 @@ const user = await trpc.getUser.query({ id: "u-123" });
 ```
 
 **tRPC is optimal when:**
+
 - Full-stack TypeScript monorepo (Next.js, SvelteKit, etc.)
 - Internal API consumed only by TypeScript clients
 - Team prioritizes rapid iteration over formal API contracts
 
 **tRPC is inappropriate when:**
+
 - Multiple language clients (types don't transfer)
 - Third-party API consumers (you need an OpenAPI spec, not TypeScript types)
 - Teams not using TypeScript
@@ -418,6 +439,7 @@ A lightweight stateless remote procedure call protocol using JSON. Version 2.0 (
 SOAP (Simple Object Access Protocol) is an XML-based messaging protocol. Relevant only for integration with legacy enterprise systems (SAP, Salesforce's older SOAP API, banking systems, healthcare).
 
 Key characteristics:
+
 - WSDL (Web Services Description Language) describes the API
 - Messages wrapped in XML `<Envelope>` with `<Header>` and `<Body>`
 - Supports WS-Security for message-level encryption and signing (not just transport)
@@ -448,11 +470,13 @@ GET /api/Products?$filter=Price lt 10.00&$orderby=Name&$select=Name,Price&$top=5
 HTTP/3 uses QUIC (UDP-based) instead of TCP:
 
 **Key differences affecting APIs:**
+
 1. **Head-of-line blocking eliminated:** In HTTP/2, a lost packet blocks all multiplexed streams on that TCP connection. HTTP/3/QUIC gives each stream independent retransmission — critical for multiplexed APIs on lossy networks
 2. **Faster connection establishment:** QUIC combines transport and TLS handshakes — 0-RTT reconnection for known servers
 3. **Connection migration:** A connection can survive an IP address change (mobile clients moving between networks)
 
 **Current state (2024–2025):**
+
 - HTTP/3 is supported by Cloudflare, Fastly, Google, Nginx 1.25+, HAProxy, AWS CloudFront
 - Browser support is ~95%+ (Chrome, Firefox, Safari all support it)
 - Server-side library support is maturing but not universal

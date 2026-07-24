@@ -17,7 +17,9 @@ APIs are contracts between a provider and consumers. Consumers build on document
 ## Breaking vs. Non-Breaking Changes
 
 ### Non-Breaking (Backward Compatible)
+
 Clients built against the old API continue to work without changes:
+
 - Adding a new optional field to a response body
 - Adding a new optional request field
 - Adding a new endpoint
@@ -27,7 +29,9 @@ Clients built against the old API continue to work without changes:
 - Adding enum values to a response field (caution: clients that switch on enum may break)
 
 ### Breaking Changes
+
 Existing clients break without modification:
+
 - Removing or renaming a field in a request or response
 - Changing a field's type (e.g., `string` → `integer`)
 - Making an optional field required
@@ -38,6 +42,7 @@ Existing clients break without modification:
 - Changing authentication scheme
 
 ### Subtle Breaking Changes (Often Missed)
+
 - Adding new enum values to a request field (if the server now rejects unknown enum values)
 - Tightening validation (a formerly accepted value now fails)
 - Changing the order of operations in a transactional endpoint
@@ -59,6 +64,7 @@ Existing clients break without modification:
 **Examples:** Stripe (`/v1/`), GitHub REST API (`/v3/`), Twilio, most public APIs.
 
 **Advantages:**
+
 - Immediately visible in logs, URLs, browser address bar
 - Easy to route in proxies/gateways based on URL prefix
 - Clear intent — developers know exactly which version they're calling
@@ -67,6 +73,7 @@ Existing clients break without modification:
 - Can serve different versions from different backends
 
 **Disadvantages:**
+
 - URL "changes" the resource identity (REST purists object — `https://api.example.com/users/123` and `https://api.example.com/v2/users/123` refer to the same logical resource)
 - Old version URLs persist in bookmarks, documentation, codebases forever
 - Must decide on versioning granularity (service-level? resource-level?)
@@ -83,11 +90,13 @@ Api-Version: 2024-01-01
 **Examples:** Stripe (uses this for behavior sub-versioning within `/v1/`), Cloudflare.
 
 **Advantages:**
+
 - Clean URLs that don't change between versions
 - Version-specific routing possible in gateways
 - Can carry date-based version strings (more expressive than integers)
 
 **Disadvantages:**
+
 - Not browser-friendly (must use API client to set custom headers)
 - Requires the `Vary: Api-Version` response header for correct HTTP caching behavior
 - Less discoverable — consumers must read docs to know the header exists
@@ -105,10 +114,12 @@ Accept: application/vnd.example.v2+json
 **RFC-compliant** but rarely used in practice.
 
 **Advantages:**
+
 - Formally "correct" by HTTP content negotiation semantics
 - Version is part of the media type, not the URL
 
 **Disadvantages:**
+
 - Extremely developer-unfriendly (verbose, not testable in browsers)
 - Caching requires `Vary: Accept`
 - Essentially no major public API uses this approach
@@ -126,11 +137,13 @@ GET /users/123?api-version=2024-01-01
 **Examples:** Azure REST APIs use `?api-version=2024-01-01`.
 
 **Advantages:**
+
 - Easy to add to existing URLs
 - Testable in browser
 - Explicit in logs
 
 **Disadvantages:**
+
 - Pollutes query string space
 - Easy to forget (no default behavior is clear)
 - Caching behavior: CDNs may cache `/users/123` and `/users/123?version=2` as different entries — good for correctness but not for cache efficiency
@@ -160,6 +173,7 @@ Some APIs succeed by committing to strict backward compatibility:
 **Facebook/Meta Graph API:** Versioned, but maintains old versions for extended periods (~2 years).
 
 **The additive-only contract:**
+
 - Never remove fields from responses
 - Never change field types
 - Never make optional fields required
@@ -197,6 +211,7 @@ These headers are machine-readable — monitoring tools can alert teams when the
 | A specific field (not endpoint) | 6 months | 12 months |
 
 **What to do at sunset:**
+
 1. Return `410 Gone` with a helpful body pointing to the migration guide
 2. Do not silently redirect (this defeats the purpose)
 3. Retain the 410 response for 6+ months so latecomers understand what happened
@@ -214,6 +229,7 @@ Contract testing moves API compatibility verification from integration environme
 Pact is the leading framework for consumer-driven contract testing. The flow:
 
 **1. Consumer writes a test:**
+
 ```javascript
 // consumer/user-service.test.js
 const { Pact } = require('@pact-foundation/pact');
@@ -250,11 +266,13 @@ describe('User Service', () => {
 ```
 
 **2. Pact file published to Pact Broker:**
+
 ```bash
 pact-broker publish ./pacts --broker-base-url https://pacts.example.com --consumer-app-version $COMMIT_SHA
 ```
 
 **3. Provider verifies:**
+
 ```javascript
 // provider/user-service.pact.test.js
 const { Verifier } = require('@pact-foundation/pact');
@@ -278,17 +296,20 @@ describe('Pact Verification', () => {
 ```
 
 **4. `can-i-deploy` gate in CI:**
+
 ```bash
 pact-broker can-i-deploy \
   --pacticipant UserService \
   --version $COMMIT_SHA \
   --to-environment production
 ```
+
 This command queries the Pact Broker to determine whether all consumers that use this provider version are compatible. If a consumer depends on a field that this version removed, the check fails.
 
 ### Bi-Directional Contract Testing (PactFlow)
 
 PactFlow's bi-directional approach uses OpenAPI specs on the provider side:
+
 1. Provider uploads their OpenAPI spec to PactFlow
 2. Consumer uploads their Pact file (generated from consumer tests)
 3. PactFlow checks that every consumer interaction is a valid subset of the provider's OpenAPI spec
@@ -317,6 +338,7 @@ oasdiff breaking --fail-on ERR origin/main.yaml HEAD.yaml
 ```
 
 **Severity levels:**
+
 - `error`: Definitively breaking
 - `warning`: Likely breaking (evaluate context)
 
@@ -338,6 +360,7 @@ buf breaking --against '.git#branch=main'
 In a microservices environment, every service exposes an API. Versioning strategy must be decided at the platform level:
 
 **Service-level vs. resource-level versioning:**
+
 - Service-level: `/orders/v2/...` — entire service gets a new version
 - Resource-level: `/v2/orders` but `/v1/products` — different resources at different versions
 
@@ -352,6 +375,7 @@ Service-level is simpler to reason about and deploy. Resource-level allows granu
 ## When Not to Version
 
 If you control all API consumers (internal services, owned frontends), aggressive versioning may be unnecessary overhead. Instead:
+
 - Expand-contract pattern: add the new field, migrate all callers, remove the old field — all in coordinated deploys
 - Feature flags: use flags to deploy new behavior to specific callers before full rollout
 - Server-sent versioning: embed a schema version in responses; clients handle both old and new schemas until all are migrated

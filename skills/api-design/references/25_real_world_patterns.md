@@ -33,6 +33,7 @@ The `object` field allows clients to identify what type they received without ch
 ### Event Objects for Every State Change
 
 Every meaningful state change in Stripe emits a corresponding event object:
+
 - `charge.succeeded`, `charge.failed`, `charge.refunded`
 - `invoice.paid`, `invoice.payment_failed`
 - `subscription.created`, `subscription.updated`, `subscription.canceled`
@@ -44,6 +45,7 @@ Webhook consumers receive these events and can reconstruct any state from the ev
 ### Idempotency Key Design
 
 Stripe requires idempotency keys for all POST requests:
+
 - Scope: (account, key) — same key across different accounts doesn't conflict
 - TTL: 30 days (extended from 24 hours in v2)
 - Returns cached response if key already used (same status code + body)
@@ -173,6 +175,7 @@ mutation ProductCreate($input: ProductInput!) {
 ```
 
 Response when validation fails:
+
 ```json
 {
   "data": {
@@ -193,6 +196,7 @@ The mutation returns `product: null` and `userErrors` populated, with `data.prod
 ### Rate Limits as Buckets (Leaky Bucket)
 
 Shopify's API uses a leaky bucket rate limiting model:
+
 - Each store gets a bucket of `40` requests
 - Each API call costs 1 unit
 - Bucket refills at 2 units/second
@@ -207,6 +211,7 @@ Shopify's API uses a leaky bucket rate limiting model:
 ### Consistent Action Naming in Service APIs
 
 AWS uses `Verb + Noun` naming for all API actions:
+
 - `CreateInstance`, `DescribeInstances`, `ModifyInstance`, `TerminateInstance`
 - `PutObject`, `GetObject`, `DeleteObject`, `ListObjects`
 

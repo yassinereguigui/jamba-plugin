@@ -32,17 +32,20 @@ Discovery → Signup → Get API key → First successful call → First integra
 ```
 
 **Reducing signup friction:**
+
 - Free tier without credit card (Stripe, Twilio, GitHub all do this)
 - Immediate API key on signup — no email verification gate before first API call
 - Sandbox/test environment with pre-populated test data
 
 **The sandbox environment:**
+
 - Same API contract as production
 - Test API keys (visually distinguishable: `sk_test_` vs `sk_live_`)
 - Test data: pre-created test products, customers, cards (Stripe's `tok_visa` test token)
 - Safe to call freely without real-world consequences
 
 **First call optimization:**
+
 ```bash
 # The ideal first API call: one line, works immediately
 curl https://api.example.com/orders \
@@ -54,6 +57,7 @@ Stripe's quickstart guide targets < 5 minutes from `npm install stripe` to a suc
 ### Free Tier Design
 
 The free tier is a DX artifact, not just a pricing decision:
+
 - **Limits should be generous enough to build and test** a full integration: 1,000 free API calls/month is too low for a developer building an integration
 - **Limits should not be a daily interruption:** Quota limits that reset daily interrupt development workflows
 - **Clear upgrade path:** Developers should know exactly what they get when they upgrade
@@ -67,6 +71,7 @@ The free tier is a DX artifact, not just a pricing decision:
 **Generated SDKs** (openapi-generator output): Mechanically correct but often unidiomatic. They map 1:1 to the HTTP API with method names like `ordersCreatePost()`.
 
 **Idiomatic SDKs** (Stripe, Twilio style): Designed for the target language. Method names are natural: `stripe.orders.create()`. They handle:
+
 - Pagination (automatic iteration over pages)
 - Retry with exponential backoff (built-in, configurable)
 - Idempotency keys (generated automatically or accepted explicitly)
@@ -78,6 +83,7 @@ The gap between generated and idiomatic SDKs has closed significantly with Fern 
 ### Pagination Helpers
 
 A major DX differentiator. Without a helper:
+
 ```javascript
 // Without SDK pagination helper — tedious and error-prone
 let cursor;
@@ -91,6 +97,7 @@ do {
 ```
 
 With SDK pagination helper:
+
 ```python
 # Python SDK with auto-pagination
 orders = []
@@ -99,6 +106,7 @@ for order in stripe.Order.list(customer='cus_123', auto_paging=True):
 ```
 
 Or lazy iteration:
+
 ```typescript
 // TypeScript — lazy async iteration
 for await (const order of client.orders.list({ customerId: 'c-123' })) {
@@ -126,6 +134,7 @@ except client.errors.APIError as e:
 ```
 
 **Bad pattern (common in generated SDKs):**
+
 ```python
 # Don't force developers to parse raw HTTP responses
 try:
@@ -186,11 +195,13 @@ order = await async_client.orders.create(customer_id='c-123')
 Inline API consoles (Swagger UI "Try It", Redoc, Scalar, Stoplight Elements) let developers make API calls directly from documentation:
 
 **Value:**
+
 - Zero setup: no Postman, no curl — call from browser immediately
 - Populated examples: pre-filled request bodies with realistic values
 - Live authentication: enter API key, test immediately
 
 **Common failure modes:**
+
 - CORS not configured for the documentation domain (most common failure)
 - Authentication form doesn't clearly indicate where to get a test API key
 - Examples don't reflect common use cases (auto-generated examples are often useless)
@@ -204,6 +215,7 @@ Inline API consoles (Swagger UI "Try It", Redoc, Scalar, Stoplight Elements) let
 ### Changelog as First-Class Artifact
 
 A changelog communicates trust. Developers checking whether your API is safe to build on will look at:
+
 1. How often does it break?
 2. How much notice do you give?
 3. Do you provide migration paths?
@@ -230,6 +242,7 @@ Follow [Keep a Changelog](https://keepachangelog.com/) format: Added, Changed, D
 ### Migration Guides
 
 When introducing a breaking change, provide:
+
 1. What changed and why
 2. Before/after code examples in every supported language
 3. Automated migration tool if possible (codemods, CLI migration)
@@ -246,15 +259,18 @@ Stripe's versioning blog posts are the gold standard — they include the decisi
 **Time-to-integration:** Time from signup to first production API call. Measured via event analytics (signup → first live mode request). A week or more suggests DX friction; hours to a day is excellent.
 
 **Documentation quality scores:**
+
 - Coverage: % of endpoints with descriptions, examples
 - Example validity: % of code examples that execute without errors (automated)
 - Link health: % of links not returning 404 (automated weekly scan)
 
 **SDK health:**
+
 - SDK version coverage: % of developers on SDK major version within 1 of latest
 - SDK error rate: % of SDK requests that encounter SDK-level errors (not API errors)
 
 **Support signal:**
+
 - Support ticket categorization: What % are "I couldn't find the docs" vs. "I found the docs but the API didn't work as documented"?
 - Stack Overflow question volume by topic
 
@@ -263,6 +279,7 @@ Stripe's versioning blog posts are the gold standard — they include the decisi
 ## Community and Support
 
 **Tier 1 — Self-service:**
+
 - Comprehensive reference documentation with examples
 - Searchable (Algolia DocSearch is common)
 - Code examples in 4+ languages
@@ -270,11 +287,13 @@ Stripe's versioning blog posts are the gold standard — they include the decisi
 - Status page (statuspage.io or equivalent)
 
 **Tier 2 — Community:**
+
 - Discord or Slack for developers
 - GitHub Discussions for async Q&A
 - Stack Overflow tag monitoring
 
 **Tier 3 — Direct support:**
+
 - Ticketed email support
 - SLA-backed support for paying customers
 - Dedicated support engineering for enterprise
@@ -286,6 +305,7 @@ Stripe's versioning blog posts are the gold standard — they include the decisi
 ## Real-World DX Patterns from Industry Leaders
 
 **Stripe:**
+
 - Consistent naming across all products (every resource has `id`, `object`, `created`, `livemode`)
 - Events model for every state change (webhooks for all lifecycle events)
 - Idempotency keys mandatory on all creation requests
@@ -293,12 +313,14 @@ Stripe's versioning blog posts are the gold standard — they include the decisi
 - Pre-built UI components (Stripe Elements) for the hardest part (payment form)
 
 **Twilio:**
+
 - TwiML (XML dialect for call/message control) — made real-time telephony accessible to web developers
 - Webhooks for every call/message event
 - Studio (visual flow builder) for non-code users
 - Consistent `to`/`from` parameter naming across all communication channels (SMS, voice, email)
 
 **GitHub:**
+
 - REST and GraphQL APIs covering the same functionality (different audiences)
 - Webhooks for all repository events
 - GitHub Apps model (fine-grained permissions vs. personal tokens)

@@ -13,6 +13,7 @@ Authentication (who are you?) and authorization (what are you allowed to do?) ar
 For any flow where a user delegates access to a third-party application. PKCE (Proof Key for Code Exchange) is now required for all clients per OAuth 2.1.
 
 **Full flow:**
+
 ```
 1. App generates code_verifier (random 43-128 char string)
 2. App computes code_challenge = BASE64URL(SHA256(code_verifier))
@@ -71,11 +72,13 @@ Response:
 ```
 
 Use this for:
+
 - Backend service calling another backend service
 - CI/CD pipelines calling APIs
 - Scheduled jobs accessing APIs
 
 **Client secret alternatives:** For higher security M2M auth, use client assertion (JWT signed with private key) instead of a static client secret:
+
 ```
 client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&
 client_assertion=<signed_jwt>
@@ -115,11 +118,13 @@ OpenAPI 3.2 now supports documenting this flow natively.
 ## OAuth 2.1: What Changed
 
 OAuth 2.1 (IETF draft-ietf-oauth-v2-1-15, stable as of 2025) consolidates:
+
 - RFC 6749 (OAuth 2.0)
 - RFC 7636 (PKCE)
 - RFC 9700 (OAuth 2.0 Security BCP)
 
 **Changes from 2.0:**
+
 | Change | Impact |
 |--------|--------|
 | PKCE required for all authorization code flows | Previously only required for public clients |
@@ -137,12 +142,14 @@ Most modern authorization servers (Auth0, Okta, Keycloak, AWS Cognito) already i
 OIDC is an identity layer on top of OAuth 2.0. It adds a standardized way to get verified user identity information.
 
 **Key additions over OAuth 2.0:**
+
 - **ID Token:** A JWT containing user identity claims (`sub`, `email`, `name`, etc.)
 - **UserInfo Endpoint:** `GET /userinfo` with access token returns user claims
 - **Discovery:** `GET /.well-known/openid-configuration` returns server metadata
 - **Standard Claims:** `sub`, `name`, `email`, `email_verified`, `picture`, `locale`
 
 **ID Token vs. Access Token:**
+
 ```json
 // ID Token (for the client/frontend to learn about the user)
 {
@@ -164,6 +171,7 @@ OIDC is an identity layer on top of OAuth 2.0. It adds a standardized way to get
 **Critical distinction:** The ID token's audience (`aud`) is the client app. The access token's audience is the resource server (API). Never use an access token as an ID token or vice versa.
 
 **OIDC discovery:**
+
 ```
 GET https://auth.example.com/.well-known/openid-configuration
 
@@ -206,11 +214,13 @@ APIs should use the `jwks_uri` to fetch public keys dynamically rather than hard
 ```
 
 **Advantages:**
+
 - Stateless: API can validate without calling auth server
 - Low latency: no network round-trip per request
 - Embeds claims: API gets user/role info without DB lookup
 
 **Disadvantages:**
+
 - Cannot be revoked before expiry (unless using a revocation list, which is a network call)
 - Claims in token can become stale (user changes role; old tokens still carry old role)
 - Larger payload (~500 bytes vs ~22 bytes for an opaque token)
@@ -235,11 +245,13 @@ Response:
 ```
 
 **Advantages:**
+
 - Immediately revocable: mark token inactive at auth server; next introspection returns `active: false`
 - Token content changes are reflected immediately
 - Token format is opaque to clients (harder to extract claims client-side)
 
 **Disadvantages:**
+
 - Network call per API request (latency hit)
 - Auth server becomes a critical dependency for every API call
 - Introspection responses can be cached (with short TTL), but this reintroduces the staleness problem
@@ -283,6 +295,7 @@ Response:
 ```
 
 **Storage on clients:**
+
 - Refresh tokens: `httpOnly; Secure; SameSite=Strict` cookies (backend for web apps) or platform Keychain/Keystore (native apps)
 - Access tokens: memory only (not localStorage — XSS risk)
 
@@ -293,12 +306,14 @@ Response:
 ### Authorization Models Overview
 
 **RBAC (Role-Based Access Control):** Users assigned roles; roles have permissions.
+
 ```
 User Alice → Role: "admin"
 Role "admin" → Permission: "orders:delete"
 ```
 
 **ABAC (Attribute-Based Access Control):** Access decisions based on attributes of the user, resource, and environment.
+
 ```
 Policy: ALLOW if
   user.department == resource.department AND
@@ -307,6 +322,7 @@ Policy: ALLOW if
 ```
 
 **ReBAC (Relationship-Based Access Control):** Access based on a graph of relationships between entities.
+
 ```
 Alice is editor of Document D
 Alice's team is owner of Project P
@@ -353,6 +369,7 @@ allow {
 ```
 
 OPA evaluates policies at microsecond speeds when running as a sidecar. Integration:
+
 ```
 POST http://localhost:8181/v1/data/api/authorization/allow
 {
@@ -406,6 +423,7 @@ document:doc-123#parent@folder:project-x
 ```
 
 A check: "Can Alice view doc-123?" traverses the graph:
+
 - `alice` is `viewer` of `doc-123` → ALLOW
 - or: `alice` inherits permissions via `folder:project-x` relationship
 
@@ -424,6 +442,7 @@ A check: "Can Alice view doc-123?" traverses the graph:
 ## Scopes vs. Claims for Authorization
 
 **Scopes:** OAuth mechanism for coarse-grained consent. Represent categories of access.
+
 ```
 orders:read    — Can read order data
 orders:write   — Can create/modify orders
@@ -431,6 +450,7 @@ admin:*        — Full admin access
 ```
 
 **Claims:** JWT payload fields that carry assertions about the user.
+
 ```json
 {
   "sub": "user-abc123",
@@ -442,6 +462,7 @@ admin:*        — Full admin access
 ```
 
 **The authorization hierarchy:**
+
 1. Scopes determine what *categories* of operations the token permits (user consent)
 2. Claims carry user attributes and roles
 3. Fine-grained authorization (OPA/Cerbos/SpiceDB) makes the actual per-resource decision using claims + resource attributes
@@ -483,6 +504,7 @@ Istio and Linkerd use SPIFFE SVIDs internally for their automatic mTLS.
 ## Delegated Authorization for Agentic Systems
 
 When AI agents act on behalf of users, the authorization model needs to handle:
+
 1. What is the agent permitted to do?
 2. Are the agent's actions traceable to a specific human authorization?
 3. Can the human revoke the agent's authorization?
@@ -506,6 +528,7 @@ When AI agents act on behalf of users, the authorization model needs to handle:
 **RFC 8693 (Token Exchange)** defines how to exchange tokens for delegated-authority tokens. The agent presents the user's token to the auth server and receives a narrower-scope token that records the delegation chain.
 
 **Practical implementation for agents (2024–2025):**
+
 - Issue agents short-lived tokens with minimal scopes (principle of least privilege)
 - Record all agent actions with the delegation chain in audit logs
 - Provide a "revoke agent access" UX for users
@@ -520,11 +543,13 @@ MCP (Model Context Protocol) uses OAuth 2.1 for remote server authorization — 
 For APIs serving thousands of developers with API keys:
 
 **Key lifecycle:**
+
 ```
 Generate → Distribute (once, in plaintext) → Store (hashed) → Use → Rotate → Revoke
 ```
 
 **Key generation:**
+
 ```python
 import secrets
 import hashlib
@@ -537,6 +562,7 @@ def generate_api_key(prefix: str = "sk_live") -> tuple[str, str]:
 ```
 
 **Key lookup pattern:**
+
 ```python
 def authenticate_request(provided_key: str) -> Optional[ApiKey]:
     # Extract prefix for database index

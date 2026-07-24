@@ -57,6 +57,7 @@ describe('calculateOrderTotal', () => {
 ## Integration Testing: Testing the HTTP Surface
 
 Test the API as a black box via HTTP. Tests should:
+
 - Make real HTTP requests to the running application (or a test instance)
 - Validate response status codes, headers, and body schema
 - Cover the happy path and documented error cases
@@ -139,12 +140,14 @@ schemathesis run openapi.yaml \
 ```
 
 **What Schemathesis checks by default:**
+
 - `not_a_server_error` — no endpoint returns 5xx
 - `response_schema_conformance` — responses conform to the documented schema
 - `response_headers_conformance` — headers match spec
 - `content_type_conformance` — Content-Type header is correct
 
 **What it generates:**
+
 - Minimum values, maximum values, empty strings, null values
 - Very long strings, Unicode edge cases
 - Malformed but plausible values
@@ -320,6 +323,7 @@ export default function () {
 | Spike test | 0 → 10x → 0 instantly | Validate auto-scaling behavior |
 
 **k6 in CI (smoke test pattern):**
+
 ```yaml
 - name: API Smoke Test
   run: |
@@ -401,6 +405,7 @@ curl http://localhost:4010/users/123 -H "Accept: application/json"
 ```
 
 **Prism validation proxy mode:** Sits in front of your real server and validates requests and responses against the spec:
+
 ```bash
 prism proxy openapi.yaml http://localhost:8000
 # Forwards to real server but validates both request and response
@@ -409,6 +414,7 @@ prism proxy openapi.yaml http://localhost:8000
 ### Mockoon
 
 Desktop GUI tool for creating mock APIs without code. Useful for frontend developers who need a mock API before the backend is built:
+
 - Define routes, methods, response bodies, status codes
 - Support for templating (dynamic responses)
 - Import OpenAPI specs
@@ -440,6 +446,7 @@ A persistent challenge in API testing: tests need realistic, consistent, isolate
 **Strategies:**
 
 **1. Factory pattern:**
+
 ```typescript
 function createTestOrder(overrides = {}) {
   return {
@@ -455,6 +462,7 @@ function createTestOrder(overrides = {}) {
 ```
 
 **2. Database seeding:**
+
 ```typescript
 // Before each test suite
 beforeAll(async () => {
@@ -466,6 +474,7 @@ beforeAll(async () => {
 **3. Test database per CI job:** Each CI run gets an isolated database. Works well with containerized databases (postgres:15 container per CI job).
 
 **4. Snapshot testing for responses:**
+
 ```typescript
 it('returns the order response in the expected format', async () => {
   const response = await request(app).get('/orders/fixture-order-123');
@@ -482,17 +491,20 @@ Snapshots catch unexpected response shape changes. Update snapshots intentionall
 Chaos engineering tests system resilience by deliberately injecting faults:
 
 **Tools:**
+
 - **Chaos Monkey (Netflix):** Randomly terminates instances
 - **Chaos Mesh:** Kubernetes-native chaos engineering (pod failure, network delay, HTTP fault injection)
 - **Gremlin:** Commercial platform for controlled chaos experiments
 
 **API-specific chaos scenarios:**
+
 - Downstream service returns 500 (tests circuit breaker activation)
 - Downstream service returns correct response after 5s delay (tests timeout behavior)
 - Database connection pool exhausted (tests queue saturation)
 - Third-party API returns malformed JSON (tests response validation)
 
 **Example: HTTP fault injection with Chaos Mesh:**
+
 ```yaml
 apiVersion: chaos-mesh.org/v1alpha1
 kind: HTTPChaos

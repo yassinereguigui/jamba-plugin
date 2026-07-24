@@ -236,6 +236,7 @@ oasdiff breaking \
 ```
 
 **Policy options:**
+
 1. **Block all breaking changes:** Forces semver discipline; version bump required for any breaking change
 2. **Require manual approval for breaking changes:** PR comment bot flags breaking changes; team lead must approve
 3. **Report only:** Breaking changes logged but don't block (use for established codebases that tolerate some drift)
@@ -462,11 +463,13 @@ plugins:
 ```
 
 **Canary for APIs:** More appropriate than blue-green for most API changes. Validate the new version handles real traffic before full rollout. Key metrics to monitor during canary:
+
 - Error rate (compare v1 vs v2 cohorts)
 - P95/P99 latency
 - Business metrics (order completion rate, etc.)
 
 **Automatic canary promotion (Flagger + Kubernetes):**
+
 ```yaml
 apiVersion: flagger.app/v1beta1
 kind: Canary
@@ -501,17 +504,20 @@ spec:
 Security checks in CI (before deployment) catch issues early:
 
 **42Crunch API Security Audit:**
+
 - Static analysis of OpenAPI spec
 - Detects: missing auth on endpoints, overly permissive CORS definitions, missing input validation schemas, exposed PII in responses
 - Provides a numeric score (0-100)
 - CI integration via GitHub Action
 
 **OWASP ZAP DAST (on staging):**
+
 - Run against the deployed staging environment
 - Active scan attempts actual attacks (SQL injection, XSS, etc.)
 - Passive scan observes traffic and flags issues
 
 **Pipeline placement:**
+
 ```
 PR Gate: Spectral lint → oasdiff breaking change → 42Crunch spec audit
 Staging Gate: ZAP passive scan → Schemathesis → Nuclei templates

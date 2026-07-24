@@ -64,6 +64,7 @@ def handler(event, context):
 5. **Runtime choice:** Go and Rust functions have negligible cold starts (~1ms); Python is fast; Java is slow without SnapStart.
 
 **Pricing model:**
+
 - Pay per request ($0.20/million requests)
 - Pay per compute time (GB-seconds)
 - At low volume: extremely cheap
@@ -333,6 +334,7 @@ resource "aws_apigatewayv2_route" "list_orders" {
 Organizations with multi-cloud deployments face portability challenges:
 
 **Abstraction options:**
+
 1. **API-level abstraction:** Expose a single API; backend implementation varies per cloud. The client doesn't know which cloud is serving.
 2. **Gateway-level routing:** Global load balancer routes to the appropriate cloud. Cloudflare, AWS Global Accelerator.
 3. **Accept lock-in per domain:** Orders on AWS, ML inference on GCP, legacy on Azure. Different teams, different clouds, different SDKs.
@@ -355,6 +357,7 @@ Organizations with multi-cloud deployments face portability challenges:
 | Control over runtime | Limited | Full |
 
 **Rule of thumb:**
+
 - < 100 req/s on average: Serverless (Lambda) unless you have specific reasons not to
 - 100-1000 req/s, variable: Cloud Run or Lambda with Provisioned Concurrency
 - > 1000 req/s sustained: Containers on ECS/EKS/GKE with HPA

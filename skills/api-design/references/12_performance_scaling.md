@@ -69,6 +69,7 @@ ETag: "v4-def456"            ← New ETag
 ```
 
 **ETag implementation:**
+
 ```typescript
 import { createHash } from 'crypto';
 
@@ -102,16 +103,19 @@ res.set({
 CDNs (Cloudflare, Fastly, CloudFront, Akamai) are edge networks that cache responses geographically close to consumers:
 
 **What to cache on CDN:**
+
 - Public product/catalog data (high read volume, low change frequency)
 - Static reference data (countries, currencies, categories)
 - Profile data (if not user-specific: public user profiles)
 
 **What not to cache on CDN:**
+
 - Authenticated responses with user-specific data (unless `Vary: Authorization`)
 - Responses that change per request (personalized feeds)
 - POST/PUT/DELETE responses
 
 **CDN purging pattern:**
+
 ```bash
 # Cloudflare: purge by URL on data change
 curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone}/purge_cache" \
@@ -128,14 +132,17 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone}/purge_cache" \
 ### Algorithm Comparison
 
 **Fixed Window:**
+
 ```
 Window: 0s - 60s:  10 requests allowed
 Window: 60s - 120s: 10 requests allowed
 ```
+
 Simple to implement. Problem: boundary spike — 10 requests at second 59, 10 at second 61 = 20 in 2 seconds. This can overload backends.
 
 **Sliding Window Log:**
 Track the timestamp of each request. Count requests in the last N seconds:
+
 ```python
 def is_allowed(user_id: str, limit: int, window_seconds: int) -> bool:
     now = time.time()
@@ -154,16 +161,20 @@ def is_allowed(user_id: str, limit: int, window_seconds: int) -> bool:
     redis.expire(key, window_seconds)
     return True
 ```
+
 Accurate but memory-intensive (stores every request timestamp).
 
 **Sliding Window Counter:**
 Approximate sliding window using only two fixed-window counters:
+
 ```python
 current_count = (prev_window_count * overlap_percent) + current_window_count
 ```
+
 Low memory (two counters per user), accurate within ~10%, sufficient for most APIs.
 
 **Token Bucket:**
+
 ```python
 def consume_token(user_id: str, capacity: int, refill_rate: float) -> bool:
     key = f"tokens:{user_id}"
@@ -185,6 +196,7 @@ def consume_token(user_id: str, capacity: int, refill_rate: float) -> bool:
     redis.expire(key, 3600)
     return True
 ```
+
 Allows bursts up to bucket capacity; enforces long-term rate. Best for APIs that need burst tolerance.
 
 **Leaky Bucket:**
@@ -201,6 +213,7 @@ Requests enter a queue; processed at a fixed rate. Smooths out bursty traffic in
 | Endpoint | Resource-specific limits (expensive endpoints stricter) |
 
 **Combined limits (Stripe's approach):**
+
 - Per-request-type: POST /charges is more expensive than GET /charges
 - Per-account: Total account limits prevent one account from monopolizing capacity
 - Per-IP: Unauthenticated rate limiting at the edge
@@ -266,6 +279,7 @@ async function checkRateLimit(key: string, limit: number, window: number):
 | Throttle | Slow down (add delay) rather than reject | N/A |
 
 APIs often implement all three:
+
 - Rate limit: 100 req/min (rejected if exceeded, Retry-After)
 - Quota: 1,000,000 requests/month (rejected if exceeded, upgrade to paid)
 - Throttle: above 50 req/sec, add 100ms artificial delay
@@ -294,6 +308,7 @@ const pool = new Pool({
 For an 8-core machine with SSDs: `(8 * 2) + 1 = 17` connections. More than this often hurts due to context switching.
 
 **PgBouncer** for PostgreSQL: Connection pooler that sits between application and database. Allows thousands of application connections to share a small number of actual PostgreSQL connections:
+
 - Session mode: 1 PG connection per application session (low performance gain)
 - Transaction mode: 1 PG connection per transaction (high gain, but prepared statements and `SET` don't survive)
 - Statement mode: 1 PG connection per statement (maximum density)
@@ -327,10 +342,12 @@ Content-Type: application/json
 ```
 
 **gzip vs. Brotli:**
+
 - **gzip:** Universal support, ~70% compression ratio for JSON
 - **Brotli:** Better compression (~20% better than gzip), slightly slower compression, universal browser support (not all CDN/proxy support)
 
 **When to compress:**
+
 - Compress JSON responses > 1KB
 - Never compress responses < 1KB (compression overhead > bandwidth saving)
 - Never compress already-compressed formats (JPEG, PNG, video)
@@ -338,6 +355,7 @@ Content-Type: application/json
 **Benchmarks:** For typical API JSON payloads, gzip reduces payload size by 60-80%. A 10KB JSON response becomes 2-4KB. At high volume (1M requests/day), this saves significant bandwidth cost.
 
 **NGINX compression:**
+
 ```nginx
 gzip on;
 gzip_types application/json application/javascript text/plain text/css;
@@ -403,6 +421,7 @@ LIMIT 20;
 ```
 
 **Required index for keyset pagination:**
+
 ```sql
 CREATE INDEX idx_orders_pagination ON orders (created_at DESC, id DESC);
 ```
@@ -457,6 +476,7 @@ app.use((req, res, next) => {
 ```
 
 **Request priority assignment:**
+
 - Health checks: critical (never shed)
 - Payment processing: high
 - User-facing reads: medium
@@ -476,6 +496,7 @@ Client → API Gateway → Queue → Worker → Database
 When the queue depth exceeds a threshold, the API returns 503 with `Retry-After` rather than queuing more work. This prevents memory exhaustion and cascading failure.
 
 **Kubernetes HPA (Horizontal Pod Autoscaler) as backpressure mechanism:**
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -511,6 +532,7 @@ spec:
 **Sparse fieldsets:** Allow clients to request only needed fields (see `03_design_principles.md`).
 
 **Projection at the database layer:**
+
 ```sql
 -- Only fetch fields the client requested
 SELECT id, email, name FROM users WHERE id = $1
@@ -519,6 +541,7 @@ SELECT id, email, name FROM users WHERE id = $1
 
 **Response streaming for large datasets:**
 Instead of loading 100k records into memory and returning them as one JSON array, stream:
+
 ```
 HTTP/1.1 200 OK
 Content-Type: application/x-ndjson   # Newline-delimited JSON
@@ -539,6 +562,7 @@ If both client and server are controlled systems (internal APIs), Protocol Buffe
 Running API logic at CDN edge nodes eliminates round-trips to origin:
 
 **Cloudflare Workers:**
+
 ```typescript
 // Edge function — runs in 200+ locations worldwide
 export default {

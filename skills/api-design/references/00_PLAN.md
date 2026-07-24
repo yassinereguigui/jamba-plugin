@@ -65,19 +65,23 @@ Produce an exhaustive, authoritative, practitioner-grade knowledge base on API d
 
 ### Primary Sources (by domain cluster)
 
-**Specifications:** 
+**Specifications:**
+
 - spec.openapis.org, json-schema.org, asyncapi.com, typespec.io, buf.build
 - RFCs: RFC 9457 (Problem Details), RFC 8594 (Sunset), RFC 6749/6750 (OAuth), RFC 7519 (JWT)
 
 **Security:**
+
 - OWASP API Security Top 10 2023, NIST guidelines
 - Practitioner blogs: Philippe De Ryck, Auth0 blog, Okta developer
 
 **Paradigms:**
+
 - Roy Fielding's dissertation (REST), GraphQL spec, gRPC documentation
 - Martin Fowler's blog, Phil Sturgeon's blog
 
 **Real-world patterns:**
+
 - Stripe API docs and engineering blog
 - Twilio blog
 - GitHub API docs and REST conventions
@@ -85,11 +89,13 @@ Produce an exhaustive, authoritative, practitioner-grade knowledge base on API d
 - AWS Builder's Library
 
 **AI/MCP:**
+
 - MCP specification (modelcontextprotocol.io)
 - Anthropic and OpenAI function calling documentation
 - Emerging practitioner writing (2024–2025)
 
 ### Research Method Per Domain
+
 1. Fetch primary spec/RFC where applicable
 2. Search for practitioner critique/adoption reports
 3. Search for 2024–2025 updates and emerging patterns

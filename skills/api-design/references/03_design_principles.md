@@ -37,6 +37,7 @@ API design is the practice of shaping the contract between a server and its cons
 REST resource design centers on modeling entities as nouns, not actions. The HTTP method expresses the action.
 
 **Wrong:**
+
 ```
 POST /getUser
 POST /createOrder
@@ -44,6 +45,7 @@ POST /cancelSubscription
 ```
 
 **Right:**
+
 ```
 GET    /users/{id}
 POST   /orders
@@ -51,6 +53,7 @@ DELETE /subscriptions/{id}
 ```
 
 **When verbs are acceptable:** Some operations don't map cleanly to CRUD on a resource. Action-based endpoints are legitimate for:
+
 - State transitions: `POST /orders/{id}/ship` (shipping an order is an action, not a CRUD operation on the order resource)
 - Bulk operations: `POST /orders/batch-cancel`
 - Commands with complex inputs: `POST /documents/{id}/translate`
@@ -79,6 +82,7 @@ GET /users/{id}/orders/{orderId}
 **Nesting depth limit:** Two levels (`/resources/{id}/sub-resources`) is the practical maximum. Deeper nesting signals a modeling problem — the nested resource should either be a top-level resource or the relationship should be expressed via query parameters.
 
 **Query strings:**
+
 ```
 # Filtering
 GET /orders?status=pending&customerId=c-123
@@ -121,6 +125,7 @@ GET /orders?cursor=eyJpZCI6MTIzfQ&limit=20
 ### Common Misuses
 
 **PUT vs. PATCH:**
+
 ```
 # PUT — replace the entire resource (idempotent full replacement)
 PUT /users/123
@@ -136,6 +141,7 @@ PATCH /users/123
 If your API uses PUT to mean "partial update," it's wrong. Clients that send `PUT /users/123 { "name": "Alice" }` expecting only the name to change will silently corrupt other fields.
 
 **POST for creation vs. action:**
+
 ```
 # Creating a resource — POST to collection
 POST /orders
@@ -164,6 +170,7 @@ Common misuse patterns with correct alternatives:
 | `500` for all errors | `503 Service Unavailable` | Downstream dependency unavailable |
 
 **The 400 vs. 422 distinction:**
+
 - `400 Bad Request`: Malformed request syntax (invalid JSON, missing required headers), or fundamentally invalid input (wrong data type for a field).
 - `422 Unprocessable Entity`: Request is syntactically valid but semantically invalid (email field has valid string format but is already registered; date range where start > end).
 
@@ -188,6 +195,7 @@ SELECT * FROM orders ORDER BY created_at DESC LIMIT 20 OFFSET 100;
 **Additional problem:** Insertion/deletion during pagination causes records to shift. A new order inserted between page 1 and page 2 requests causes one record to appear twice (once as the "last" record of page 1 and once as the "first" of page 2), or a record to be skipped.
 
 **When offset is acceptable:**
+
 - Small, rarely-changing datasets (<10k rows)
 - Admin interfaces where users navigate to a specific page number
 - Reports and exports where data is static during pagination
@@ -268,11 +276,13 @@ A variant of offset where clients specify page number. Identical performance cha
 ### Filtering Conventions
 
 Simple equality filters via query parameters:
+
 ```
 GET /orders?status=pending&customerId=c-123
 ```
 
 Range filters — various conventions (no universal standard):
+
 ```
 # Convention 1: Suffix operators
 GET /orders?createdAt[gte]=2024-01-01&createdAt[lte]=2024-12-31
@@ -337,6 +347,7 @@ POST /users/batch
 3. **Fail-fast:** Stop on first failure. Simplest to implement; poor UX for large batches.
 
 **207 Multi-Status pattern (recommended for best-effort):**
+
 ```json
 HTTP/1.1 207 Multi-Status
 {
@@ -376,6 +387,7 @@ Retry-After: 5
 ```
 
 **Polling the operation:**
+
 ```
 GET /operations/op-abc123
 
@@ -389,6 +401,7 @@ GET /operations/op-abc123
 ```
 
 **Completion:**
+
 ```
 {
   "operationId": "op-abc123",
@@ -413,6 +426,7 @@ Idempotency keys prevent duplicate operations when clients retry after network f
 ### Implementation Pattern (based on Stripe's approach)
 
 **Client:** Generate a unique key (UUID v4) per logical operation, include in header:
+
 ```
 POST /charges
 Idempotency-Key: 4d3eee9e-ca56-4ab2-8d01-6e8d1c7a0521
@@ -420,6 +434,7 @@ Idempotency-Key: 4d3eee9e-ca56-4ab2-8d01-6e8d1c7a0521
 ```
 
 **Server algorithm:**
+
 1. Extract `Idempotency-Key` header
 2. Look up key in idempotency store (Redis, database)
 3. If not found: acquire a lock on the key, execute the operation, store `(key, response, fingerprint)`, release lock, return response
@@ -428,6 +443,7 @@ Idempotency-Key: 4d3eee9e-ca56-4ab2-8d01-6e8d1c7a0521
 6. If found with different request fingerprint (same key, different body): return `422 Unprocessable Entity` — key collision
 
 **Storage considerations (Brandur's implementation guide):**
+
 ```sql
 CREATE TABLE idempotency_keys (
   key VARCHAR(255) PRIMARY KEY,
@@ -466,6 +482,7 @@ Accept: application/problem+json
 ```
 
 **Practical use:**
+
 - Most APIs serve only `application/json` — content negotiation is irrelevant
 - `application/problem+json` (RFC 9457) is worth supporting for error responses
 - `application/x-ndjson` (newline-delimited JSON) for streaming large datasets
@@ -482,11 +499,13 @@ Jon Postel's robustness principle: "Be conservative in what you send, be liberal
 **For API design, this is contested:**
 
 **Arguments for applying it:**
+
 - Reduces friction for early API consumers
 - Allows graceful evolution (ignore unknown fields rather than error)
 - Improves tolerance for minor protocol variations
 
 **Arguments against (the modern position):**
+
 - Strict validation at the boundary catches bugs earlier (fail fast)
 - Accepting malformed input creates implicit contracts that are hard to break
 - Security: "being liberal in what you accept" has caused multiple injection vulnerabilities
@@ -498,12 +517,14 @@ Jon Postel's robustness principle: "Be conservative in what you send, be liberal
 ## API Contracts and Forward Compatibility
 
 **Additive changes are non-breaking (generally):**
+
 - Adding a new optional field to a response
 - Adding a new endpoint
 - Adding a new optional query parameter
 - Adding a new optional request body field
 
 **Breaking changes:**
+
 - Removing or renaming a field
 - Changing a field's type
 - Adding a new required field to a request
@@ -529,6 +550,7 @@ GET /users/123?fields=id,email,name
 ```
 
 **JSON:API standardizes this as `fields[type]=field1,field2`:**
+
 ```
 GET /users/123?fields[users]=id,email,name
 ```

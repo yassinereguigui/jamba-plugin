@@ -29,6 +29,7 @@ OpenAPI 3.1 fixed this completely. Any valid JSON Schema 2020-12 document is now
 **Breaking impact: `nullable` removed**
 
 OpenAPI 3.0:
+
 ```yaml
 # 3.0 pattern — custom extension
 properties:
@@ -38,6 +39,7 @@ properties:
 ```
 
 OpenAPI 3.1:
+
 ```yaml
 # 3.1 pattern — standard JSON Schema union type
 properties:
@@ -104,6 +106,7 @@ info:
 #### 5. `$ref` Alongside Sibling Properties
 
 OpenAPI 3.0 did not allow properties alongside `$ref`. OpenAPI 3.1 (following JSON Schema) allows:
+
 ```yaml
 schema:
   $ref: '#/components/schemas/BaseUser'
@@ -118,6 +121,7 @@ schema:
 OpenAPI 3.2.0 is a non-breaking upgrade from 3.1 (no removal of existing features).
 
 **Hierarchical Tags**
+
 ```yaml
 tags:
   - name: orders
@@ -126,9 +130,11 @@ tags:
     description: Shipping operations
     parent: orders
 ```
+
 Enables documentation rendering with collapsible tag hierarchies. Previously required vendor extensions.
 
 **First-Class Streaming Support**
+
 ```yaml
 responses:
   '200':
@@ -140,10 +146,12 @@ responses:
             itemSchema:
               $ref: '#/components/schemas/StreamChunk'
 ```
+
 Native description of SSE and streaming responses without hacks.
 
 **QUERY Method**
 A new HTTP method concept: `QUERY` (from the IETF HTTP Working Group draft). A semantically safe, idempotent method that accepts a request body — the long-sought "GET with body" solution.
+
 ```yaml
 paths:
   /products/search:
@@ -156,6 +164,7 @@ paths:
 ```
 
 **OAuth 2.0 Device Authorization Flow**
+
 ```yaml
 securitySchemes:
   deviceOAuth:
@@ -252,6 +261,7 @@ AsyncAPI describes event-driven and message-driven APIs — Kafka topics, AMQP q
 ### The Core Change: Channel/Operation Separation
 
 **AsyncAPI v2 (confusing):**
+
 ```yaml
 channels:
   user/created:
@@ -263,6 +273,7 @@ channels:
 The ambiguity: `subscribe` meant "applications can subscribe to this channel" — i.e., your app *publishes*. This consistently confused developers.
 
 **AsyncAPI v3 (explicit):**
+
 ```yaml
 channels:
   userCreated:           # Arbitrary ID, not the topic address
@@ -405,6 +416,7 @@ interface Orders {
 This TypeSpec generates valid OpenAPI 3.1 YAML with proper schemas, paths, and components — roughly 10x more compact than hand-authored OpenAPI.
 
 **Multi-target output:** The same TypeSpec can emit to:
+
 - OpenAPI 3.0 / 3.1
 - JSON Schema
 - Protobuf (experimental)
@@ -414,6 +426,7 @@ This TypeSpec generates valid OpenAPI 3.1 YAML with proper schemas, paths, and c
 ### TypeSpec Adoption State
 
 As of 2025, TypeSpec is:
+
 - Used internally across all major Azure services and Microsoft Graph
 - Open-source with a growing external community
 - **Production-ready** for teams generating OpenAPI from it
@@ -481,18 +494,21 @@ Smithy's `smithy-build.json` can emit to OpenAPI, SDK source code (multiple lang
 The serialization format and IDL used by gRPC. See `01_api_paradigms.md` for gRPC detail. Schema evolution rules summarized:
 
 **Safe changes (backward and forward compatible):**
+
 - Add new fields (new field numbers)
 - Rename fields (field number is identity in wire format)
 - Add new enum values
 - Add new message types
 
 **Unsafe changes (breaking):**
+
 - Change a field's type
 - Reuse a deleted field number
 - Remove a field without `reserved`
 - Change `optional` to `required`
 
 **Best practice — always use reserved:**
+
 ```protobuf
 message User {
   reserved 3, 5;             // Protect deleted field numbers
@@ -505,6 +521,7 @@ message User {
 ```
 
 **buf CLI** enforces breaking change detection:
+
 ```bash
 buf breaking --against '.git#branch=main'
 # Reports: FIELD_SAME_TYPE, FIELD_NO_DELETE, etc.
@@ -583,10 +600,12 @@ In JSON Schema 2020-12 and OpenAPI 3.1, `$defs` is the canonical location for re
 Spectral (Stoplight) is the de facto standard API linter. It validates OpenAPI, AsyncAPI, and arbitrary JSON/YAML against configurable rulesets.
 
 **Built-in rulesets:**
+
 - `spectral:oas` — OpenAPI best practices (30+ rules)
 - `spectral:asyncapi` — AsyncAPI validation
 
 **Custom ruleset example (`.spectral.yaml`):**
+
 ```yaml
 extends:
   - spectral:oas
@@ -626,12 +645,14 @@ rules:
 ```
 
 **CI integration:**
+
 ```bash
 spectral lint openapi.yaml --ruleset .spectral.yaml --format junit > results.xml
 # Non-zero exit on error-severity violations — fails the CI pipeline
 ```
 
 **Custom TypeScript functions:**
+
 ```typescript
 // spectral-functions/requireExamples.ts
 export default (targetValue: unknown, options: unknown, context: any) => {
@@ -657,6 +678,7 @@ vacuum report openapi.yaml --format html -o report.html
 ### Redocly CLI
 
 Redocly CLI combines linting, bundling, and documentation preview:
+
 ```bash
 redocly lint openapi.yaml
 redocly bundle openapi.yaml -o bundled.yaml  # Resolves all $refs into one file

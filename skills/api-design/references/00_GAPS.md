@@ -11,6 +11,7 @@ This document records topics that were identified during research but not covere
 ### GraphQL In-Depth (Planned as 22_graphql_in_depth.md)
 
 **What's missing:** A dedicated file on GraphQL was planned but the depth was covered within `01_api_paradigms.md` to avoid repetition. Missing:
+
 - Schema stitching vs. Federation: detailed comparison of approaches for combining schemas
 - Relay specification in full depth: connection cursor spec, Node interface, refetch containers
 - GraphQL subscriptions: WebSocket transport, SSE transport (newer), scaling concerns
@@ -23,6 +24,7 @@ This document records topics that were identified during research but not covere
 ### gRPC In-Depth (Planned as 23_grpc_in_depth.md)
 
 **What's missing:**
+
 - grpc-web and Envoy proxy: serving gRPC to browsers
 - Reflection API: runtime schema discovery
 - Health checking: gRPC health checking protocol
@@ -36,6 +38,7 @@ This document records topics that were identified during research but not covere
 ### API Contracts Deep Dive (Planned as 24_api_contracts.md)
 
 **What's missing:**
+
 - Pact internals: how the pact file format works, matchers in depth
 - Contract testing for GraphQL: schemacheck vs. Pact for GraphQL, schema registry approach
 - AsyncAPI contract testing with Microcks: step-by-step guide
@@ -47,6 +50,7 @@ This document records topics that were identified during research but not covere
 ### Financial and Regulated API Patterns
 
 **What's missing:**
+
 - PCI-DSS compliance for payment APIs: what the standard requires, scope reduction patterns
 - HIPAA-compliant API design: audit logging, PHI handling, BAA requirements
 - FAPI (Financial-grade API) profile: OAuth 2.0 extension for banking APIs, open banking
@@ -58,6 +62,7 @@ This document records topics that were identified during research but not covere
 ### API Monetization
 
 **What's missing:**
+
 - Usage-based pricing models: per-call, per-token, per-resource
 - API product management: rate plans, developer tiers, freemium design
 - Billing integration: how Apigee, Kong Enterprise, and Zuplo handle billing
@@ -69,6 +74,7 @@ This document records topics that were identified during research but not covere
 ### WebAssembly (WASM) at the API Edge
 
 **What's missing:**
+
 - Cloudflare Workers + WASM: running non-JavaScript code at edge
 - WASI (WebAssembly System Interface): standardized system calls for WASM
 - WASM for API gateway plugins: Envoy's WASM extension mechanism
@@ -79,6 +85,7 @@ This document records topics that were identified during research but not covere
 ### Quantum-Safe Cryptography Impact on APIs
 
 **What's missing:**
+
 - Post-quantum TLS: NIST-selected algorithms (ML-KEM, ML-DSA, SLH-DSA)
 - Timeline for TLS 1.3 + post-quantum hybrids
 - Impact on JWT signing: when RS256 and ES256 become insufficient
@@ -89,6 +96,7 @@ This document records topics that were identified during research but not covere
 ### Multi-Tenant API Architecture
 
 **What's missing:**
+
 - Tenant isolation patterns: shared database, schema per tenant, database per tenant
 - Tenant-aware rate limiting: per-tenant limits vs. per-account limits
 - Cross-tenant data access control: ensuring tenant A cannot access tenant B's data
@@ -100,6 +108,7 @@ This document records topics that were identified during research but not covere
 ### API Analytics and Business Intelligence
 
 **What's missing:**
+
 - API usage analytics beyond RED metrics: consumer journey, conversion funnel
 - Chargeback and showback for internal APIs
 - Developer funnel analytics: signup → first call → integration → production → renewal
@@ -111,6 +120,7 @@ This document records topics that were identified during research but not covere
 ### Temporal APIs and Time-Aware Design
 
 **What's missing:**
+
 - Bi-temporal data models in APIs: valid time vs. transaction time
 - Event sourcing at the API level: exposing event history through APIs
 - Temporal precision in API contracts: `date-time` format ambiguities (timezone assumptions)
@@ -121,6 +131,7 @@ This document records topics that were identified during research but not covere
 ### AI Gateway Deep Dive
 
 **What's missing:**
+
 - LiteLLM configuration in production: routing rules, fallbacks, load balancing
 - Portkey advanced features: semantic caching, request/response transforms
 - Building a custom AI gateway: when and how
@@ -134,15 +145,19 @@ This document records topics that were identified during research but not covere
 ## Topics That Were Intentionally Excluded
 
 ### SOAP Deep Dive
+
 Covered only as survival knowledge in `01_api_paradigms.md`. A full SOAP reference would add little value for new projects. Teams integrating with SOAP legacy systems should consult vendor-specific SOAP client documentation.
 
 ### API-Specific Frontend Frameworks
+
 React Query, SWR, TanStack Query, Apollo Client — these are client-side data fetching libraries that consume APIs, not API design topics. Excluded as out of scope.
 
 ### Database Design for APIs
+
 The N+1 problem, connection pooling, and pagination query optimization are covered in `12_performance_scaling.md`. Full database design (schema design, indexing strategy, normalization) is a separate domain.
 
 ### Cryptography Foundations
+
 JWT signing algorithms, HMAC, TLS handshakes — covered at the implementation level in `05_security.md` and `06_authentication_authorization.md`. Deep cryptographic foundations (elliptic curves, RSA math) are out of scope for an API design knowledge base.
 
 ---
@@ -167,6 +182,7 @@ The following topics are rapidly evolving and should be re-researched before mak
 **Primary limitation:** This knowledge base is based on primary sources (specifications, RFCs, vendor documentation, practitioner blogs) and synthesized by training. Real-world operational experience — knowing which tools fail at which scale, which vendor's documentation misleads, which architectural patterns create organizational problems — is not fully capturable from secondary sources.
 
 **Recommendation:** Supplement this knowledge base with:
+
 1. Post-mortems from your own production incidents
 2. War stories from practitioners at similar-scale companies (conference talks, blogs)
 3. Hands-on experimentation with tooling before committing in production

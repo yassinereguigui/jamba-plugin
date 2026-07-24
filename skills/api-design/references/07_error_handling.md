@@ -11,22 +11,27 @@ Error handling is one of the most neglected aspects of API design and one of the
 ### The Common Misuses
 
 **200 with an error body:**
+
 ```json
 // WRONG — don't do this
 HTTP/1.1 200 OK
 { "success": false, "error": "User not found" }
 ```
+
 This pattern breaks HTTP caching, monitoring, and alerting. All downstream systems (CDNs, load balancers, API gateways, observability tools) interpret 2xx as success. You lose metric clarity and make client error handling harder.
 
 **Generic 400 for everything:**
+
 ```
 400 → "Bad request" (for validation, business logic, conflicts, missing auth... everything)
 ```
+
 This is common but suboptimal. 4xx codes carry semantic meaning.
 
 ### The Status Code Reference
 
 **2xx — Success:**
+
 | Code | Name | Use |
 |------|------|-----|
 | 200 | OK | GET, PUT, PATCH, DELETE success with body |
@@ -36,6 +41,7 @@ This is common but suboptimal. 4xx codes carry semantic meaning.
 | 207 | Multi-Status | Partial success (batch operations) |
 
 **3xx — Redirection:**
+
 | Code | Name | Use |
 |------|------|-----|
 | 301 | Moved Permanently | Permanent URL change (update bookmarks) |
@@ -44,6 +50,7 @@ This is common but suboptimal. 4xx codes carry semantic meaning.
 | 308 | Permanent Redirect | Like 301 but preserves HTTP method |
 
 **4xx — Client Errors:**
+
 | Code | Name | Use |
 |------|------|-----|
 | 400 | Bad Request | Malformed syntax, invalid JSON, missing required headers |
@@ -58,6 +65,7 @@ This is common but suboptimal. 4xx codes carry semantic meaning.
 | 429 | Too Many Requests | Rate limit exceeded; include `Retry-After` header |
 
 **5xx — Server Errors:**
+
 | Code | Name | Use |
 |------|------|-----|
 | 500 | Internal Server Error | Unexpected server failure |
@@ -69,6 +77,7 @@ This is common but suboptimal. 4xx codes carry semantic meaning.
 ### The 401 vs. 403 Distinction
 
 This confuses many engineers:
+
 - **401 Unauthorized:** The request lacks valid authentication credentials. Response should include `WWW-Authenticate` header indicating what auth scheme to use. Send this when the user is not logged in or their token is expired/invalid.
 - **403 Forbidden:** Authentication succeeded; the authenticated identity lacks permission for this resource. Do not return `WWW-Authenticate`.
 
@@ -99,6 +108,7 @@ RFC 9457 (July 2023, superseding RFC 7807) defines a standard JSON structure for
 ```
 
 **Field semantics:**
+
 - **`type`** (URI): Identifies the problem type. Should resolve to human-readable documentation. Stable across instances.
 - **`title`** (string): Human-readable summary of the problem type. Same for all instances of this type; do not include specific values.
 - **`status`** (integer): HTTP status code for this problem. Should match the response status code.
@@ -114,6 +124,7 @@ RFC 9457 (July 2023, superseding RFC 7807) defines a standard JSON structure for
 ### Implementation Patterns
 
 **Express.js:**
+
 ```typescript
 class ProblemDetailsError extends Error {
   type: string;
@@ -164,6 +175,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 ```
 
 **Throwing in handlers:**
+
 ```typescript
 // Business logic throws typed errors
 throw new ProblemDetailsError({
@@ -176,6 +188,7 @@ throw new ProblemDetailsError({
 ```
 
 **Validation errors (multiple field errors):**
+
 ```json
 {
   "type": "https://api.example.com/problems/validation-failed",
@@ -248,6 +261,7 @@ X-Correlation-ID: req-7f8a3b2c-...
 ```
 
 The correlation ID should be:
+
 - Generated at the API gateway or service entry point
 - Propagated to all downstream service calls (via headers)
 - Included in all log entries for the request
@@ -256,6 +270,7 @@ The correlation ID should be:
 ### What Not to Include in Error Responses
 
 **Stack traces:** Expose internal implementation details and may reveal exploitable information.
+
 ```json
 // WRONG
 {
@@ -264,6 +279,7 @@ The correlation ID should be:
 ```
 
 **Database error messages:** Reveal table/column names, query structure.
+
 ```json
 // WRONG
 {
@@ -289,12 +305,14 @@ X-RateLimit-Reset: 1735689600
 ```
 
 `Retry-After` accepts either a number of seconds or an HTTP date:
+
 ```
 Retry-After: 120
 Retry-After: Thu, 01 Jan 2026 00:00:00 GMT
 ```
 
 **API documentation should specify backoff behavior:**
+
 ```
 On 429 responses:
 - Read the Retry-After header
@@ -332,6 +350,7 @@ gRPC uses a distinct set of status codes that require mapping when exposing gRPC
 | UNIMPLEMENTED | 501 | Not implemented |
 
 gRPC status messages carry a `Status` message in the trailer:
+
 ```protobuf
 // ErrorInfo provides rich error details
 import "google/rpc/error_details.proto";
@@ -353,6 +372,7 @@ GraphQL has two distinct error patterns:
 ### Top-Level Errors
 
 Request-level errors that prevent execution:
+
 ```json
 {
   "errors": [
@@ -370,6 +390,7 @@ Request-level errors that prevent execution:
 ### Partial Success (Inline Errors)
 
 The defining feature of GraphQL error handling — operations can partially succeed:
+
 ```json
 {
   "data": {
@@ -397,6 +418,7 @@ This partial success behavior is simultaneously GraphQL's power (clients get wha
 **Union types for typed errors (preferred pattern):**
 
 Instead of relying on the `errors` array, encode error cases in the schema:
+
 ```graphql
 union CreateUserResult = User | EmailAlreadyExistsError | ValidationError
 
@@ -417,6 +439,7 @@ type Mutation {
 ```
 
 This makes error handling explicit in the type system rather than hidden in the `errors` array. The client must handle the union:
+
 ```graphql
 mutation CreateUser($input: CreateUserInput!) {
   createUser(input: $input) {
@@ -436,6 +459,7 @@ This pattern (popularized by Shopify's GraphQL API) is considered best practice 
 When Service A calls Service B, and Service B returns an error, Service A must decide:
 
 **1. Translate the error** (most common):
+
 ```python
 try:
     user = user_service.get_user(user_id)
@@ -448,6 +472,7 @@ except UserService.ServiceUnavailableError:
 Clients of Service A should not see Service B's internal error format.
 
 **2. Propagate correlation IDs** (always do this):
+
 ```python
 headers = {
     'X-Correlation-ID': request.correlation_id,
@@ -457,6 +482,7 @@ headers = {
 
 **3. Handle circuit breaker states:**
 When a downstream service is repeatedly failing, a circuit breaker opens and fails fast without calling the service:
+
 ```python
 # With resilience4j-style circuit breaker
 @circuit_breaker(failure_threshold=5, timeout=10)
