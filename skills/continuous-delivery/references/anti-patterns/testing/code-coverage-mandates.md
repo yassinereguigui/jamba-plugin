@@ -12,7 +12,7 @@ tags:
   - process-gates
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

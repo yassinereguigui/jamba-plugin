@@ -90,6 +90,7 @@ sentence each. Do not explain your reasoning unless asked.
 
 On session start - assemble context in this order (earlier items are stable and cache
 across sessions; later items change each session):
+
 1. Implementation agent system prompt rules [stable - cached]
 2. Feature description [stable within a feature - often cached]
 3. BDD scenario for this session [changes per session]
@@ -97,6 +98,7 @@ across sessions; later items change each session):
 5. Prior session summary [changes per session]
 
 Do NOT include:
+
 - Full conversation history from prior sessions
 - BDD scenarios for sessions other than the current one
 - Files unlikely to change in this session
@@ -105,15 +107,18 @@ Before passing context to the implementation agent, confirm each item passes thi
 would omitting it change what the agent does? If no, omit it.
 
 On implementation complete:
+
 - Invoke the review orchestrator with: staged diff, current BDD scenario, feature
   description. Nothing else.
 - Do not proceed to commit if the review orchestrator returns "decision": "block"
 
 On pipeline failure:
+
 - Route only to pipeline-restore mode
 - Block new feature implementation until the pipeline is green
 
 On commit:
+
 - Write a context summary using the format defined in Small-Batch Sessions
 - This summary replaces the full session conversation for future sessions
 - Reset context after writing the summary; do not carry conversation history forward
@@ -155,6 +160,7 @@ identify a file you need that was not provided, request it with this format and 
 Do not infer, guess, or reproduce the contents of files not in your context.
 
 Implementation:
+
 - Write the acceptance test for this scenario before writing production code
 - Do not modify test specifications; tests define behavior, you implement to them
 - Do not implement behavior from other scenarios, even if it seems related
@@ -186,6 +192,7 @@ coordination cheaply. Claude: Haiku. Gemini: Flash.
 step. Structured output here eliminates ambiguity and reduces the token cost of the
 aggregation step.
 
+```json
 {
   "decision": "pass | block",
   "findings": [
@@ -198,6 +205,7 @@ aggregation step.
     }
   ]
 }
+```
 
 An empty `findings` array with `"decision": "pass"` means all sub-agents passed. A
 non-empty `findings` array always accompanies `"decision": "block"`.
@@ -211,6 +219,7 @@ You coordinate parallel review sub-agents. You do not review code yourself.
 Output verbosity: return exactly the JSON schema below. No prose before or after it.
 
 Context passed to each sub-agent - minimum necessary only:
+
 - Semantic agent: staged diff + BDD scenario
 - Security agent: staged diff only
 - Performance agent: staged diff + feature description (performance budgets only)
@@ -220,11 +229,14 @@ Do not pass the full session context to sub-agents. Each sub-agent receives only
 its specific check requires.
 
 Execution:
+
 - Invoke all four sub-agents in parallel
 - A single sub-agent block is sufficient to return "decision": "block"
 - Aggregate sub-agent findings into the findings array; add the agent field to each
 
 Return this JSON and nothing else:
+
+```json
 {
   "decision": "pass | block",
   "findings": [
@@ -237,6 +249,7 @@ Return this JSON and nothing else:
     }
   ]
 }
+```
 
 ---
 
@@ -285,6 +298,7 @@ Early exit: if the diff contains no logic changes (formatting or comments only),
 return {"decision": "pass", "findings": []} immediately without analysis.
 
 Check:
+
 - Does the implementation match what the BDD scenario specifies?
 - Are there code paths the tests do not exercise?
 - Will the logic fail on boundary values not covered by the scenario?
@@ -293,12 +307,15 @@ Check:
 Do not flag style issues (linter) or security issues (security agent).
 
 Return this JSON and nothing else:
+
+```json
 {
   "decision": "pass | block",
   "findings": [
     {"file": "<path>", "line": <n>, "issue": "<one sentence>", "why": "<one sentence>"}
   ]
 }
+```
 
 ### Security Review Agent
 
@@ -343,6 +360,7 @@ Early exit: if the diff introduces no code that processes external input and no
 state-changing operations, return {"decision": "pass", "findings": []} immediately.
 
 Check:
+
 - Injection vectors requiring data flow understanding: second-order injection,
   type coercion attacks, deserialization vulnerabilities
 - State-changing operations without an authorization check
@@ -353,6 +371,8 @@ Do not flag vulnerabilities detectable by standard SAST pattern-matching;
 those are handled by the SAST hook before this agent runs.
 
 Return this JSON and nothing else:
+
+```json
 {
   "decision": "pass | block",
   "findings": [
@@ -360,6 +380,7 @@ Return this JSON and nothing else:
      "why": "<one sentence>", "cwe": "<CWE-NNN or OWASP category>"}
   ]
 }
+```
 
 ### Performance Review Agent
 
@@ -404,6 +425,7 @@ Early exit: if the diff introduces no external calls and no resource allocations
 return {"decision": "pass", "findings": []} immediately without analysis.
 
 Check:
+
 - External calls (HTTP, database, queue, cache) without a configured timeout
 - Timeouts set at the entry point but not propagated to nested calls in the same path
 - Resource allocations without a matching cleanup in both success and failure branches
@@ -414,12 +436,15 @@ Do not flag performance characteristics that require benchmarks to measure;
 those are handled at CD Stage 2.
 
 Return this JSON and nothing else:
+
+```json
 {
   "decision": "pass | block",
   "findings": [
     {"file": "<path>", "line": <n>, "issue": "<one sentence>", "why": "<one sentence>"}
   ]
 }
+```
 
 ### Concurrency Review Agent
 
@@ -456,6 +481,7 @@ Early exit: if the diff introduces no shared mutable state and no message consum
 or event handler code, return {"decision": "pass", "findings": []} immediately.
 
 Check:
+
 - Shared mutable state accessed from code paths that can execute concurrently
 - Operations that assume a specific execution order without enforcing it
 - Check-then-act sequences and non-atomic read-modify-write operations
@@ -466,12 +492,15 @@ Do not flag thread safety issues that null-safe type systems or language
 immutability guarantees already prevent.
 
 Return this JSON and nothing else:
+
+```json
 {
   "decision": "pass | block",
   "findings": [
     {"file": "<path>", "line": <n>, "issue": "<one sentence>", "why": "<one sentence>"}
   ]
 }
+```
 
 ---
 
@@ -510,6 +539,7 @@ Invokes the review orchestrator against all staged changes.
 ## /review
 
 Run the pre-commit review gate:
+
 1. Collect all staged changes as a unified diff
 2. Assemble the review orchestrator's context in this order:
    a. Review orchestrator system prompt rules [stable - cached]
@@ -531,6 +561,7 @@ Closes the session, validates all gates, writes the summary, and commits.
 ## /end-session
 
 Complete the session:
+
 1. Confirm the pre-commit hook passed (lint, type-check, secret-scan, SAST)
 2. Confirm /review returned {"decision": "pass"}
 3. Confirm the pipeline is green (all prior acceptance tests pass)
@@ -574,6 +605,7 @@ The review orchestrator only runs if the hooks pass.
 
 **Pre-commit hook sequence:**
 
+```yaml
 pre-commit:
   steps:
     - name: lint-and-format
@@ -606,6 +638,7 @@ pre-commit:
       depends-on: [lint-and-format, type-check, secret-scan, sast]
       on-fail: block-commit
       maps-to: "Semantic, security (beyond SAST), performance, concurrency"
+```
 
 **Why the hook sequence matters:** Standard tooling runs first because it is faster and
 cheaper than AI review. If the linter fails, there is no reason to invoke the review

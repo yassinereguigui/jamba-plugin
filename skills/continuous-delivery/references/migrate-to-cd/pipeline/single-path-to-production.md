@@ -6,7 +6,7 @@ description: >
   All changes reach production through the same automated pipeline - no exceptions.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 
@@ -74,7 +74,9 @@ cannot be confident that the hotfix has undergone the same validation.
 
 **Integration Branch:**
 
+```text
 trunk -> integration <- features
+```
 
 This creates two merge structures instead of one. When trunk changes, you merge to the
 integration branch immediately. When features change, you merge to integration at least
@@ -85,6 +87,7 @@ that stay unfinished forever.
 
 **GitFlow (multiple long-lived branches):**
 
+```text
 master (production)
   |
 develop (integration)
@@ -94,6 +97,7 @@ feature branches -> develop
 release branches -> master
   |
 hotfix branches -> master -> develop
+```
 
 GitFlow creates multiple merge patterns depending on change type:
 
@@ -109,9 +113,11 @@ merge conflicts multiply across integration points.
 **The correct approach** is direct trunk integration - all work integrates directly to
 trunk using the same process:
 
+```text
 trunk <- features
 trunk <- bugfixes
 trunk <- hotfixes
+```
 
 ### Environment-specific pipelines
 
@@ -140,11 +146,13 @@ Use feature flags to decouple deployment from release. Code can be merged and de
 through the pipeline while the feature remains hidden behind a flag. This eliminates the
 need for long-lived branches and separate deployment paths for "not-ready" features.
 
+```javascript
 // Feature code lives in trunk, controlled by flags
 if (featureFlags.newCheckout) {
   return renderNewCheckout()
 }
 return renderOldCheckout()
+```
 
 ### Branch by abstraction
 
@@ -153,12 +161,14 @@ incremental changes that can be deployed through the standard pipeline at every 
 Create an abstraction layer, build the new implementation behind it, switch over
 incrementally, and remove the old implementation - all through the same pipeline.
 
+```javascript
 // Old behavior behind abstraction
 class PaymentProcessor {
   process() {
     // Gradually replace implementation while maintaining interface
   }
 }
+```
 
 ### Dark launching
 
@@ -166,10 +176,12 @@ Deploy new functionality to production without exposing it to users. The code ru
 production, processes real data, and generates real metrics - but its output is not shown
 to users. This validates the change under production conditions while managing risk.
 
+```javascript
 // New API route exists but isn't exposed to users
 router.post('/api/v2/checkout', newCheckoutHandler)
 
 // Final commit: update client to use new route
+```
 
 ### Connect tests last
 
@@ -178,6 +190,7 @@ live dependency. Validate the deployment, the configuration, and the basic behav
 Connect to the real dependency as the final step. This keeps the change deployable through
 the pipeline at every stage of development.
 
+```javascript
 // Build new feature code, integrate to trunk
 // Connect to UI/API only in final commit
 function newCheckoutFlow() {
@@ -186,6 +199,7 @@ function newCheckoutFlow() {
 
 // Final commit: wire it up
 <button onClick={newCheckoutFlow}>Checkout</button>
+```
 
 ## What Your Team Controls vs. What Requires Broader Change
 
@@ -247,6 +261,7 @@ only way.
 
 ### Single Pipeline for Everything
 
+```yaml
 # .github/workflows/deploy.yml
 name: Deployment Pipeline
 
@@ -292,6 +307,7 @@ jobs:
     steps:
       - run: kubectl set image deployment/app app=app:${{ github.sha }}
       - run: kubectl rollout status deployment/app
+```
 
 Every deployment - normal, hotfix, or rollback - uses this pipeline. Consistent, validated,
 traceable.

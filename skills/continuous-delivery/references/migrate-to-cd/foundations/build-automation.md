@@ -6,7 +6,7 @@ description: >
   Automate your build process so a single command builds, tests, and packages your application.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 Build automation is the single-command loop that makes CI possible. If you cannot build, test, and package with one command, you cannot automate your pipeline.
 
@@ -94,6 +94,7 @@ Fast builds keep developers in flow. Caching is the primary mechanism for build 
 
 Developers, CI, and CD should all use the same entry point.
 
+```text
 # Example: Makefile as the single entry point
 
 .PHONY: build test package all
@@ -101,17 +102,18 @@ Developers, CI, and CD should all use the same entry point.
 all: build test package
 
 build:
-	./gradlew compileJava
+ ./gradlew compileJava
 
 test:
-	./gradlew test
+ ./gradlew test
 
 package:
-	docker build -t myapp:$(GIT_SHA) .
+ docker build -t myapp:$(GIT_SHA) .
 
 clean:
-	./gradlew clean
-	docker rmi myapp:$(GIT_SHA) || true
+ ./gradlew clean
+ docker rmi myapp:$(GIT_SHA) || true
+```
 
 The CI server runs `make all`. A developer runs `make all`. The result is the same. There is no separate "CI build script" that diverges from what developers run locally.
 
@@ -142,6 +144,7 @@ The CI server is the mechanism that runs your build automatically.
 
 Regardless of which CI tool you use (GitHub Actions, GitLab CI, Jenkins, CircleCI), the configuration follows the same pattern:
 
+```yaml
 # Conceptual CI configuration (adapt to your tool)
 trigger:
   branch: main  # Run on every commit to trunk
@@ -153,6 +156,7 @@ steps:
   - run: tests
   - run: package
   - report: test results and build status
+```
 
 ### CI Principles for Phase 1
 

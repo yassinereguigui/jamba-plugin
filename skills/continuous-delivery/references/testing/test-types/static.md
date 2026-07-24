@@ -57,6 +57,7 @@ benefits from linting, formatting, and dependency scanning.
 
 A `.eslintrc.json` configuration enforcing test quality rules:
 
+```json
 {
   "rules": {
     "no-disabled-tests": "warn",
@@ -67,27 +68,32 @@ A `.eslintrc.json` configuration enforcing test quality rules:
     "no-console": "warn"
   }
 }
+```
 
 ### Type Checking
 
 Statically typed languages catch type mismatches at compile time, eliminating entire classes
 of runtime errors. Java, for example, rejects incompatible argument types before the code runs:
 
+```java
 public static double calculateTotal(double price, int quantity) {
     return price * quantity;
 }
 
 // Compiler error: incompatible types: String cannot be converted to double
 calculateTotal("19.99", 3);
+```
 
 ### Dependency Scanning
 
 Dependency scanning tools scan for known vulnerabilities:
 
+```bash
 $ npm audit
 found 2 vulnerabilities (1 moderate, 1 high)
   moderate: Prototype Pollution in lodash < 4.17.21
   high:     Remote Code Execution in log4j < 2.17.1
+```
 
 ### Types of Static Analysis
 
@@ -114,6 +120,7 @@ criteria - see Accessibility testing.
 
 An accessibility checker configuration running WCAG 2.1 AA checks against rendered pages:
 
+```json
 {
   "defaults": {
     "standard": "WCAG2AA",
@@ -125,9 +132,11 @@ An accessibility checker configuration running WCAG 2.1 AA checks against render
     "http://localhost:1313/docs/testing/"
   ]
 }
+```
 
 An accessibility scanner test asserting that a rendered component has no violations:
 
+```javascript
 // accessibility scanner setup (e.g. import scanner and extend assertions)
 
 it("should have no accessibility violations", async () => {
@@ -135,6 +144,7 @@ it("should have no accessibility violations", async () => {
   const results = await accessibilityScanner(container);
   expect(results).toHaveNoViolations();
 });
+```
 
 ## Anti-Patterns
 

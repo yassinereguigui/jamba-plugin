@@ -108,6 +108,7 @@ Refactor the files listed below. The goal is to improve readability and
 reduce duplication introduced during the last four feature sessions.
 
 Constraints:
+
 - No behavior changes. All existing tests must pass unchanged.
 - No new features, even small ones.
 - No changes outside the listed files.

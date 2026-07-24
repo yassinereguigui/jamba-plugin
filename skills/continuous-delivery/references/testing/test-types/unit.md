@@ -69,6 +69,7 @@ a component test or an end-to-end test instead.
 
 A JavaScript unit test verifying a pure utility function:
 
+```javascript
 // castArray.test.js
 describe("castArray", () => {
   it("should wrap non-array items in an array", () => {
@@ -86,11 +87,13 @@ describe("castArray", () => {
     expect(castArray()).toEqual([]);
   });
 });
+```
 
 A Java sociable unit test exercising real domain logic through its public interface. The
 collaborators (the pricing policy and the order model) are real objects, not mocks, and the test
 asserts on the observable outcome - the computed total - rather than on which methods were called:
 
+```java
 @Test
 public void appliesBulkDiscountWhenQuantityReachesThreshold() {
     // Arrange: real collaborators, no test doubles - this is pure in-process logic
@@ -114,6 +117,7 @@ public void chargesFullPriceBelowTheThreshold() {
 
     assertEquals(money("180.00"), pricing.totalFor(order));
 }
+```
 
 ## Anti-Patterns
 

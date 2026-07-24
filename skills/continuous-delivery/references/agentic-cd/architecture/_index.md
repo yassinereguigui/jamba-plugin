@@ -7,4 +7,3 @@ description: >
 ---
 
 These pages cover how to structure agents, configure coding and review workflows, and keep agent sessions small enough for reliable delivery.
-

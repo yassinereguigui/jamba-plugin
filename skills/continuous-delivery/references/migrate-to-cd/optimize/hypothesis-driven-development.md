@@ -6,7 +6,7 @@ description: >
   Treat every change as an experiment with a predicted outcome, measure the result, and adjust future work based on evidence.
 ---
 
-**Phase 3 - Optimize** | 
+**Phase 3 - Optimize** |
 
 Hypothesis-driven development treats every change as an experiment. Instead of building features because someone asked for them and hoping they help, teams state a predicted outcome before writing code, measure the result after deployment, and use the evidence to decide what to do next. Combined with feature flags, small batches, and metrics-driven improvement, this practice closes the loop between shipping and learning.
 
@@ -94,6 +94,7 @@ Build the change using the same continuous delivery practices you use for any ot
 
 **Example implementation:**
 
+```java
 public class CheckoutController {
 
     private final FeatureFlagService flags;
@@ -118,6 +119,7 @@ public class CheckoutController {
         return new CheckoutPage(cart);
     }
 }
+```
 
 ### 4. Measure Results
 

@@ -6,7 +6,7 @@ description: >
   Integrate all work to the trunk at least once per day to enable continuous integration.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 Trunk-based development is the first foundation to establish. Without daily integration to a shared trunk, the rest of the CD migration cannot succeed. This page covers the core practice, two migration paths, and a tactical guide for getting started.
 

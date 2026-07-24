@@ -6,7 +6,7 @@ description: >
   Self-assess your team against MinimumCD practices to understand your starting point and determine where to begin your migration.
 ---
 
-**Phase 0 - Assess** | 
+**Phase 0 - Assess** |
 
 This checklist translates the practices defined by [MinimumCD.org](https://minimumcd.org) into
 concrete yes-or-no questions you can answer about your team today. It is not a test to pass. It is

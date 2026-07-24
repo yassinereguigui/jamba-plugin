@@ -55,6 +55,7 @@ Handler unit tests and component tests run in CI Stage 1; adapter integration te
 
 `Money.usd` takes minor units (cents); 4250 represents $42.50.
 
+```java
 @Test
 void same_message_processed_twice_creates_one_payment_record() {
   PaymentEvent event = new PaymentEvent(
@@ -68,7 +69,9 @@ void same_message_processed_twice_creates_one_payment_record() {
   assertThat(repo.findByEventId("evt-9f12")).hasSize(1);
   assertThat(repo.totalForOrder(OrderId.of("ord-001"))).isEqualTo(Money.usd(4250));
 }
+```
 
+```csharp
 [Fact]
 public void Same_message_processed_twice_creates_one_payment_record()
 {
@@ -82,7 +85,9 @@ public void Same_message_processed_twice_creates_one_payment_record()
     repo.FindByEventId("evt-9f12").Should().HaveCount(1);
     repo.TotalForOrder(OrderId.Of("ord-001")).Should().Be(Money.Usd(4250));
 }
+```
 
+```javascript
 test("same message processed twice creates one payment record", () => {
   const event = new PaymentEvent(
     "evt-9f12", OrderId.of("ord-001"), Money.usd(4250));
@@ -95,4 +100,4 @@ test("same message processed twice creates one payment record", () => {
   expect(repo.findByEventId("evt-9f12")).toHaveLength(1);
   expect(repo.totalForOrder(OrderId.of("ord-001"))).toEqual(Money.usd(4250));
 });
-
+```

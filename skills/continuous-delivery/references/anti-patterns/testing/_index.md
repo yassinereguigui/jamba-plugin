@@ -9,4 +9,3 @@ description: >
 These anti-patterns affect how teams build confidence that their code is safe to deploy. They
 create slow pipelines, flaky feedback, and manual gates that prevent the continuous flow of
 changes to production.
-

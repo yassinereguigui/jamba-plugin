@@ -8,4 +8,3 @@ description: >
 
 Anti-patterns related to how teams are organized, how they share responsibility, and what
 behaviors the organization incentivizes.
-

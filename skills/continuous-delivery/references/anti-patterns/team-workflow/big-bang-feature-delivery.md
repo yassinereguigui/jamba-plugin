@@ -11,7 +11,7 @@ tags:
   - work-decomposition
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

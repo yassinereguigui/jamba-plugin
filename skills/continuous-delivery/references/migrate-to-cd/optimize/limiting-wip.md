@@ -6,7 +6,7 @@ description: >
   Focus on finishing work over starting new work to improve flow and reduce cycle time.
 ---
 
-**Phase 3 - Optimize** | 
+**Phase 3 - Optimize** |
 
 Work in progress (WIP) is inventory. Like physical inventory, it loses value the longer it sits unfinished. Limiting WIP is the most counterintuitive and most impactful practice in this entire migration: doing less work at once makes you deliver more.
 

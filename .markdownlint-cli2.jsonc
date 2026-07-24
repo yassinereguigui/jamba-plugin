@@ -1,13 +1,11 @@
 {
-  // Lint all authored markdown. The two skills are being migrated to
-  // strict-clean markdown; each stays in `ignores` (a ratchet) only until it
-  // is fully green, then it is removed here and enforced permanently. This is
-  // progressive enforcement, not a permanent exclusion.
+  // Lint all authored markdown, including both skills. Nothing is excluded from
+  // enforcement — the skills were migrated to strict-clean markdown and are now
+  // enforced permanently.
   "globs": ["**/*.md"],
   "ignores": [
     "node_modules/**",
-    ".git/**",
-    "skills/continuous-delivery/**" // ratchet: migrating (needs code-fencing first)
+    ".git/**"
   ],
   "config": {
     "default": true,
@@ -15,6 +13,8 @@
     "MD060": false, // table pipe spacing — compact tables are fine
     "MD004": false, // list marker style — dash or plus both fine
     "MD024": { "siblings_only": true }, // repeated sub-headings under different parents are fine
-    "MD025": { "front_matter_title": "" } // frontmatter `title` is not a body heading
+    "MD025": { "front_matter_title": "" }, // frontmatter `title` is not a body heading
+    "MD033": false, // inline HTML is legitimate here: Mermaid <br/>, <details>, <sub>, placeholders like <name>
+    "MD036": false // standalone bold is legitimate emphasis; the rule can't tell it from a heading
   }
 }

@@ -6,7 +6,7 @@ description: >
   Separate configuration from code so the same artifact works in every environment.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 

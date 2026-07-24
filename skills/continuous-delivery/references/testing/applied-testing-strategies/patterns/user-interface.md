@@ -66,6 +66,7 @@ Because UI component tests run in a real browser engine, there is no renderer-le
 
 A flow-oriented test for the checkout error path. Playwright drives a headless browser; the backend is stubbed at the network layer with `page.route`; the team's existing unit-testing framework (Vitest, JUnit, xUnit) runs the test. The assertion: the user sees a documented error message and the spinner does not get stuck.
 
+```java
 @Test
 void shows_error_and_clears_spinner_when_checkout_fails_with_500() {
   try (Playwright playwright = Playwright.create();
@@ -87,7 +88,9 @@ void shows_error_and_clears_spinner_when_checkout_fails_with_500() {
     assertThat(page.getByRole(AriaRole.STATUS)).not().isVisible();
   }
 }
+```
 
+```csharp
 [Fact]
 public async Task Shows_error_and_clears_spinner_when_checkout_fails_with_500()
 {
@@ -110,7 +113,9 @@ public async Task Shows_error_and_clears_spinner_when_checkout_fails_with_500()
         .ToContainTextAsync("Something went wrong, please try again");
     await Expect(page.GetByRole(AriaRole.Status)).Not.ToBeVisibleAsync();
 }
+```
 
+```javascript
 import { test, expect, beforeAll, afterAll } from "vitest";
 import { chromium } from "playwright";
 
@@ -137,5 +142,6 @@ test("shows error and clears spinner when checkout fails with 500", async () => 
     .toContainText(/something went wrong, please try again/i);
   await expect(page.getByRole("status")).not.toBeVisible();
 });
+```
 
 The test exercises the rendered DOM the way a real user would. Intercepting at the network layer with `page.route` keeps the same fixtures reusable when the component test gets promoted to an end-to-end smoke test against the real backend.

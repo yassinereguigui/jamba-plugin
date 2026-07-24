@@ -6,7 +6,7 @@ description: >
   Every artifact that defines your system (infrastructure, pipelines, configuration, database schemas, monitoring) belongs in version control and is delivered through pipelines.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 If it is not in version control, it does not exist. If it is not delivered through a pipeline, it
 is a manual step. Manual steps block continuous delivery. This page establishes the principle that

@@ -6,7 +6,7 @@ description: >
   Clear, automated criteria that determine when a change is ready for production.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 
@@ -153,19 +153,22 @@ validations. This gives developers the fastest possible feedback while still run
 comprehensive checks:
 
 Stage 1: Fast Feedback (< 5 min)
-  - Linting
-  - Unit tests
-  - Security scan
+
+- Linting
+- Unit tests
+- Security scan
 
 Stage 2: Integration (< 15 min)
-  - Integration tests
-  - Database migrations
-  - API contract tests
+
+- Integration tests
+- Database migrations
+- API contract tests
 
 Stage 3: Comprehensive (< 30 min)
-  - E2E tests
-  - Performance tests
-  - Compliance checks
+
+- E2E tests
+- Performance tests
+- Compliance checks
 
 Each stage acts as a gate. If Stage 1 fails, the pipeline stops immediately rather than
 wasting time on slower checks that will not matter.
@@ -176,22 +179,30 @@ While the categories of validation should be consistent across the organization,
 specific checks may vary by deployment target. Define a base set of checks that always
 apply, then layer additional checks for higher-risk environments:
 
+```yaml
 # Base definition (always required)
+
 base_deployable:
-  - unit_tests: pass
-  - security_scan: pass
-  - code_coverage: >= 80%
+
+- unit_tests: pass
+- security_scan: pass
+- code_coverage: >= 80%
 
 # Production-specific (additional requirements)
+
 production_deployable:
-  - load_tests: pass
-  - disaster_recovery_tested: true
-  - runbook_updated: true
+
+- load_tests: pass
+- disaster_recovery_tested: true
+- runbook_updated: true
 
 # Feature branch (relaxed for experimentation)
+
 feature_deployable:
-  - unit_tests: pass
-  - security_scan: no_critical
+
+- unit_tests: pass
+- security_scan: no_critical
+```
 
 This approach lets teams move fast during development while maintaining rigorous
 standards for production deployments.

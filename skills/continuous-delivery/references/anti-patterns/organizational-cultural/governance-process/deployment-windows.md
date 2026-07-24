@@ -11,7 +11,7 @@ tags:
   - batch-size
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

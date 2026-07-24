@@ -13,7 +13,9 @@ not yet completed and delivered to production. This includes all types of work:
 stories, defects, tasks, spikes, and any other items that a team member has begun
 but not finished.
 
+```text
 wip = countOf(items where status is between "started" and "done")
+```
 
 WIP is a leading indicator from Lean manufacturing. Unlike trailing metrics such as
 Development Cycle Time or
@@ -23,7 +25,9 @@ quality.
 
 Little's Law provides the mathematical relationship:
 
+```text
 cycleTime = wip / throughput
+```
 
 If throughput (the rate at which items are completed) stays constant, increasing WIP
 directly increases cycle time. The only way to reduce cycle time without working

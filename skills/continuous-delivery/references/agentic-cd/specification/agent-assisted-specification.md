@@ -131,6 +131,7 @@ The four specification stages produce four artifacts: intent description, user-f
 
 Review these four specification artifacts for internal consistency
 before implementation begins. Check:
+
 - Clarity: is the intent unambiguous? Could it be read differently by two developers?
 - Testability: does every BDD scenario have clear, observable outcomes?
 - Scope: does the feature description constrain the implementation to what the intent requires, without over-engineering?

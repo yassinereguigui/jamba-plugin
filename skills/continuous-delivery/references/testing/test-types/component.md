@@ -67,6 +67,7 @@ Two boundary cases worth naming:
 A component test for a REST API, exercising the full application stack with the
 downstream inventory service replaced by a test double:
 
+```javascript
 describe("POST /orders", () => {
   it("should create an order and return 201", async () => {
     // Arrange: mock the inventory service response
@@ -98,11 +99,13 @@ describe("POST /orders", () => {
     expect(response.body.error).toMatch(/insufficient/i);
   });
 });
+```
 
 ### Frontend Component
 
 A component test exercising a login flow with a stubbed authentication service:
 
+```javascript
 describe("Login page", () => {
   it("should redirect to the dashboard after successful login", async () => {
     mockAuthService.login.mockResolvedValue({ token: "abc123" });
@@ -115,6 +118,7 @@ describe("Login page", () => {
     expect(await screen.findByText("Dashboard")).toBeInTheDocument();
   });
 });
+```
 
 ### Accessibility Verification
 
@@ -128,6 +132,7 @@ strategy: static-analysis linting catches structural violations in source, compo
 the rendered-only ones (computed contrast, focus order, keyboard operability), and manual audits
 cover the subjective remainder.
 
+```javascript
 // accessibility scanner setup
 
 describe("Checkout flow", () => {
@@ -149,6 +154,7 @@ describe("Checkout flow", () => {
     expect(results).toHaveNoViolations();
   });
 });
+```
 
 ## Anti-Patterns
 

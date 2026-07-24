@@ -12,7 +12,7 @@ tags:
   - team-dynamics
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

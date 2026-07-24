@@ -12,7 +12,7 @@ tags:
   - integration-frequency
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

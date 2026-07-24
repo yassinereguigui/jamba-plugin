@@ -8,4 +8,3 @@ description: >
 
 Anti-patterns related to how work is estimated, scheduled, and how the organization thinks
 about the feasibility of [continuous delivery](../../../reference/glossary/#cd-continuous-delivery).
-

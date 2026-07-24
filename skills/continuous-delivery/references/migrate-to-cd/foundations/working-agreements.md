@@ -6,7 +6,7 @@ description: >
   Establish shared definitions of done and ready to align the team on quality and process.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 The practices in Phase 1 (trunk-based development, testing, small work, and fast review) only work when the whole team commits to them. Working agreements make that commitment explicit. This page covers the key agreements a team needs before moving to pipeline automation in Phase 2.
 
@@ -197,11 +197,14 @@ Use this template as a starting point. Customize it for your team's context.
 ### Team Working Agreement Template
 
 # [Team Name] Working Agreement
+
 Date: [Date]
 Participants: [All team members]
 
 ## Definition of Done
+
 A work item is done when:
+
 - [ ] Code is integrated to trunk
 - [ ] All automated tests pass
 - [ ] Code has been reviewed (method: [pair / mob / PR])
@@ -210,7 +213,9 @@ A work item is done when:
 - [ ] [Add team-specific criteria]
 
 ## Definition of Ready
+
 A work item is ready when:
+
 - [ ] Acceptance criteria are defined (Given-When-Then)
 - [ ] The item can be completed in [X] days or less
 - [ ] The item is testable
@@ -219,6 +224,7 @@ A work item is ready when:
 - [ ] [Add team-specific criteria]
 
 ## CI Practices
+
 - Integration frequency: at least [X] per developer per day
 - Maximum branch age: [X] hours
 - Review turnaround: within [X] hours
@@ -226,17 +232,20 @@ A work item is ready when:
 - WIP limit: [X] items per developer
 
 ## Review Practices
+
 - Default review method: [pair / mob / async PR]
 - PR size limit: [X] lines
 - Review focus: [correctness, security, clarity]
 - Style enforcement: [automated via linting]
 
 ## Meeting Cadence
+
 - Standup: [time, frequency]
 - Retrospective: [frequency]
 - Working agreement review: [frequency, e.g., monthly]
 
 ## Agreement Review
+
 This agreement is reviewed and updated [monthly / quarterly].
 Any team member can propose changes at any time.
 All changes require team consensus.

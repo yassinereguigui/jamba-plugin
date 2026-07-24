@@ -8,4 +8,3 @@ description: >
 
 Anti-patterns related to organizational governance, approval processes, and team structure
 that create bottlenecks in the delivery process.
-

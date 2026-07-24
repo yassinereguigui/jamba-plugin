@@ -6,7 +6,7 @@ description: >
   Use your value stream map and baseline metrics to find the bottlenecks that limit your delivery flow.
 ---
 
-**Phase 0 - Assess** | 
+**Phase 0 - Assess** |
 
 Your value stream map shows you where time goes. Your
 baseline metrics tell you how fast and how safely you deliver. Now you

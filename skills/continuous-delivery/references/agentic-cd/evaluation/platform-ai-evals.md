@@ -29,7 +29,7 @@ duplicate graders, rubrics, and fixture conventions across every plugin.
 
 The [dev-plugins](https://github.com/bailejl/dev-plugins) reference implementation demonstrates a monorepo structure that separates shipping artifacts from eval infrastructure. This example uses Claude Code plugins, but the same pattern applies to any collection of reusable AI tools:
 
-```
+```text
 plugins/frontend-dev/          # Ships to users
   .claude-plugin/plugin.json
   commands/*.md

@@ -6,7 +6,7 @@ description: >
   Test in environments that match production to catch environment-specific issues early.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 

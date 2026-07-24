@@ -71,6 +71,7 @@ Same as the API provider pattern, plus:
 
 A negative-path test for downstream timeout. The payment client double simulates a slow response, the test asserts the deadline enforces and the upstream caller gets the documented error envelope:
 
+```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class PaymentTimeoutTest {
@@ -100,7 +101,9 @@ class PaymentTimeoutTest {
     assertThat(orderRepo.all()).isEmpty();
   }
 }
+```
 
+```csharp
 public class PaymentTimeoutTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient client;
@@ -137,7 +140,9 @@ public class PaymentTimeoutTests : IClassFixture<WebApplicationFactory<Program>>
         orderRepo.All().Should().BeEmpty();
     }
 }
+```
 
+```javascript
 test("returns 504 when payment service exceeds deadline", async () => {
   const slowPayments = {
     charge: () => new Promise((_, reject) => {
@@ -156,5 +161,6 @@ test("returns 504 when payment service exceeds deadline", async () => {
   expect(res.body.error.code).toBe("UPSTREAM_TIMEOUT");
   expect(orderRepo.all()).toHaveLength(0);
 });
+```
 
 The test verifies three things at once: the documented status code, the structured error body the API contract promises, and that no partial state was committed.

@@ -60,6 +60,7 @@ Doubles in this pattern are mostly around persistence. Two layers keep them hone
 
 A flow-oriented component test for an order-placement endpoint. The full app is assembled with an in-memory order repository and an in-memory event bus. The test drives the assembled component through its HTTP handlers and asserts on observable outcomes (status, persisted state, emitted event):
 
+```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class OrderPlacementTest {
@@ -87,7 +88,9 @@ class OrderPlacementTest {
         e.type().equals("OrderPlaced") && e.orderId().equals(orderId));
   }
 }
+```
 
+```csharp
 public class OrderPlacementTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient client;
@@ -118,7 +121,9 @@ public class OrderPlacementTests : IClassFixture<WebApplicationFactory<Program>>
             e.Type == "OrderPlaced" && e.OrderId == created.Id);
     }
 }
+```
 
+```javascript
 import request from "supertest";
 import { buildApp } from "./app.js";
 import { InMemoryOrderRepo } from "./test/in-memory-order-repo.js";
@@ -140,5 +145,6 @@ test("places order with valid payment creates order and emits OrderPlaced", asyn
     expect.objectContaining({ type: "OrderPlaced", orderId: res.body.id })
   );
 });
+```
 
 The test asserts on what a real caller can observe, not on private methods or call sequences inside the controller.

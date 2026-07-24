@@ -206,4 +206,3 @@ You do not need to read all of these before starting your migration. Start with 
 in Phase 1, read *Accelerate* for the business case, and refer to the other resources as you
 reach the relevant migration phase. The most important thing is to start delivering
 improvements, not to finish a reading list.
-

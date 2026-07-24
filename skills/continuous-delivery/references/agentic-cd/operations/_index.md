@@ -7,4 +7,3 @@ description: >
 ---
 
 These pages cover the operational side of ACD: how the pipeline enforces constraints, how to manage token costs, and how to measure whether agentic delivery is working.
-

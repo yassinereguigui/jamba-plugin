@@ -49,7 +49,7 @@ execution.
 
 Mirror your plugin structure with an eval directory:
 
-```
+```text
 plugins/my-tool/           # Ships to users
   commands/review.md
   agents/reviewer.md
@@ -445,7 +445,7 @@ decision points where the full quality picture matters.
 
 Gate on the regression (negative) suite:
 
-```
+```text
 Regression suite pass@1 >= 90%
 ```
 
@@ -486,7 +486,7 @@ feedback loop.
 
 **The cycle:**
 
-```
+```text
 Evals --> Deploy --> Monitor --> User reports --> New eval cases --> Evals
 ```
 

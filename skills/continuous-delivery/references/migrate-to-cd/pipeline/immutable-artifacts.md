@@ -6,7 +6,7 @@ description: >
   Build once, deploy everywhere. The same artifact is used in every environment.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 

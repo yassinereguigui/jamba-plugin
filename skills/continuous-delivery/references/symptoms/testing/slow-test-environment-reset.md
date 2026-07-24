@@ -73,6 +73,7 @@ assertion, the reset time is a direct consequence of testing at the wrong layer.
 ### Testing Only at the End
 
 When testing is deferred to a late stage - after development, after integration, before release
+
 - the tests assume a fully assembled system with a production-like database. Resetting that
 system is inherently slow because it involves restoring a large database, restarting multiple
 services, and verifying cross-service connectivity. The tests were designed for a heavyweight

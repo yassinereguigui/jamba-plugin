@@ -6,7 +6,7 @@ description: >
   Enable fast recovery from any deployment by maintaining the ability to roll back.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 
@@ -81,6 +81,7 @@ Maintain two identical production environments - blue and green. At any time, on
 (serving traffic) and the other is idle. To deploy, deploy to the idle environment, verify
 it, and switch traffic. To roll back, switch traffic back to the previous environment.
 
+```text
 Blue (current): v1.2.3
 Green (idle):   v1.2.2
 
@@ -89,6 +90,7 @@ Issue detected in Blue
 Switch traffic to Green (v1.2.2)
   |
 Instant rollback (< 30 seconds)
+```
 
 **Advantages:**
 
@@ -109,6 +111,7 @@ route a percentage of traffic to it. Monitor the canary for errors, latency, and
 metrics. If the canary is healthy, gradually increase traffic. If problems appear, route
 all traffic back to the previous version.
 
+```text
 Deploy v1.2.3 to 10% of servers
   |
 Issue detected in monitoring
@@ -116,6 +119,7 @@ Issue detected in monitoring
 Automatically roll back 10% to v1.2.2
   |
 Issue contained, minimal user impact
+```
 
 **Advantages:**
 
@@ -135,6 +139,7 @@ When a deployment introduces new behavior behind a feature flag, rollback can be
 simple as turning off the flag. The code remains deployed, but the new behavior is
 disabled. This is the fastest possible rollback - it requires no deployment at all.
 
+```javascript
 // Feature flag controls new behavior
 if (featureFlags.isEnabled('new-checkout')) {
   return renderNewCheckout()
@@ -143,6 +148,7 @@ return renderOldCheckout()
 
 // Rollback: Toggle flag off via configuration
 // No deployment needed, instant effect
+```
 
 **Advantages:**
 
@@ -174,6 +180,7 @@ The expand-contract pattern (also called parallel change) solves this:
 At every step, the previous application version remains compatible with the current
 database schema. Rollback is always safe.
 
+```sql
 -- Safe: Additive change (expand)
 ALTER TABLE users ADD COLUMN phone VARCHAR(20);
 -- Old code ignores the new column
@@ -184,6 +191,7 @@ ALTER TABLE users ADD COLUMN phone VARCHAR(20);
 ALTER TABLE users DROP COLUMN email;
 -- Old code breaks because email column is gone
 -- Rollback requires schema rollback (risky)
+```
 
 **Anti-pattern:** Destructive schema changes (dropping columns, renaming tables,
 changing types) deployed simultaneously with the application code change that requires

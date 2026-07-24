@@ -11,7 +11,7 @@ tags:
   - deployment-automation
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 
@@ -154,6 +154,7 @@ Find every location where environment-specific logic is embedded in code:
 
 Start with hardcoded URLs and connection strings - they are the easiest environment assumptions to eliminate:
 
+```java
 // Before - hard-coded environment assumption
 String apiUrl;
 if (environment.equals("production")) {
@@ -164,6 +165,7 @@ if (environment.equals("production")) {
 
 // After - externalized to configuration
 String apiUrl = config.getRequired("payments.api.url");
+```
 
 The URL is now injected at deployment time from environment-specific configuration files or
 a configuration management system. The code is identical in every environment. Adding a new
@@ -174,6 +176,7 @@ environment requires no code changes, only a new configuration entry.
 Introduce a proper feature flag mechanism wherever environment-name checks are implementing
 feature toggles:
 
+```javascript
 // Before - environment name as feature flag
 if (process.env.NODE_ENV === 'staging') {
   enableNewCheckout();
@@ -183,6 +186,7 @@ if (process.env.NODE_ENV === 'staging') {
 if (featureFlags.isEnabled('new-checkout')) {
   enableNewCheckout();
 }
+```
 
 Feature flag state is now configuration rather than code. The flag can be enabled in staging
 and disabled in production (or vice versa) without changing code. The code path that new-checkout
@@ -202,6 +206,7 @@ firing with proper test doubles:
 3. Inject a real implementation in production configuration and a test implementation in
    non-production configuration.
 
+```java
 // Before - production check suppresses email sending in test
 public void notifyUser(User user) {
     if (!environment.equals("production")) return;
@@ -212,6 +217,7 @@ public void notifyUser(User user) {
 public void notifyUser(User user, EmailService emailService) {
     emailService.send(user.email(), ...);
 }
+```
 
 The production code now runs in every environment. Tests use a recording double that captures
 what emails would have been sent, allowing tests to verify the notification logic. The

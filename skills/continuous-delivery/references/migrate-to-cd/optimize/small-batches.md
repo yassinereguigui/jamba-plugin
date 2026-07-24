@@ -6,7 +6,7 @@ description: >
   Deliver smaller, more frequent changes to reduce risk and increase feedback speed.
 ---
 
-**Phase 3 - Optimize** | 
+**Phase 3 - Optimize** |
 
 Batch size is the single biggest lever for improving delivery performance. This page covers what batch size means at every level - deploy frequency, commit size, and story size - and provides concrete techniques for reducing it.
 

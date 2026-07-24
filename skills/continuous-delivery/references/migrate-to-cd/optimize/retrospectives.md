@@ -6,7 +6,7 @@ description: >
   Continuously improve the delivery process through structured reflection.
 ---
 
-**Phase 3 - Optimize** | 
+**Phase 3 - Optimize** |
 
 A retrospective is the team's primary mechanism for turning observations into improvements. Without effective retrospectives, WIP limits expose problems that nobody addresses, metrics trend in the wrong direction with no response, and the CD migration stalls.
 

@@ -42,6 +42,7 @@ well-behaved clients by 40% because abusive clients currently consume
 
 Agents can generate code that satisfies tests but does not produce the expected user experience. User-facing behavior descriptions bridge the gap between technical correctness and user value. BDD scenarios work well here:
 
+```text
 Scenario: Client exceeds rate limit
   Given an authenticated client
   And the client has made 100 requests in the current minute
@@ -56,6 +57,7 @@ Scenario: Client within rate limit
   When the client makes a request to /api/search
   Then the request should be processed normally
   And the response should include rate limit headers showing remaining quota
+```
 
 **Key property:** Humans define the scenarios. The agent generates code to satisfy them but does not decide what scenarios to include.
 
@@ -70,6 +72,7 @@ Agents need explicit architectural context that human developers often carry in 
 ## Feature: Rate Limiting for Search API
 
 ### Musts
+
 - Rate limit middleware sits between authentication and the search handler
 - Rate limit state is stored in Redis (shared across application instances)
 - Rate limit configuration is read from the application config, not hardcoded
@@ -77,14 +80,17 @@ Agents need explicit architectural context that human developers often carry in 
 - Must be configurable per-endpoint (other endpoints may have different limits later)
 
 ### Must Nots
+
 - Must not add more than 5ms of latency to the request path
 - Must not introduce new external dependencies (Redis client library already in use for session storage)
 
 ### Preferences
+
 - Prefer middleware pattern over decorator pattern for request interception
 - Prefer sliding window counter over fixed window for smoother rate distribution
 
 ### Escalation Triggers
+
 - If Redis is unavailable, stop and ask whether to fail open (allow all requests) or fail closed (reject all requests)
 - If the existing auth middleware does not expose the client ID, stop and ask rather than modifying the auth layer
 
@@ -151,6 +157,7 @@ The implementation is the artifact most likely to be agent-generated. It must sa
 
 **Example** - agent-generated rate limiting middleware that satisfies the acceptance criteria above:
 
+```javascript
 function rateLimitMiddleware(redisClient, config) {
   return async function (req, res, next) {
     if (!req.user) {
@@ -178,6 +185,7 @@ function rateLimitMiddleware(redisClient, config) {
     next();
   };
 }
+```
 
 **Review requirements:** Agent-generated implementation must be reviewed by a human before merging to trunk. The review focuses on:
 
@@ -194,6 +202,7 @@ function rateLimitMiddleware(redisClient, config) {
 
 **Example:**
 
+```yaml
 system_constraints:
   security:
     - No secrets in source code
@@ -211,6 +220,7 @@ system_constraints:
     - All new features must have monitoring dashboards
     - Log structured data, not strings
     - Feature flags required for user-visible changes
+```
 
 **Key property:** System constraints apply globally. Unlike other artifacts that are per-change, these rules apply to every change in the system.
 

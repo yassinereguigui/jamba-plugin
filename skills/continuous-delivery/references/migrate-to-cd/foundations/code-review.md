@@ -6,7 +6,7 @@ description: >
   Streamline code review to provide fast feedback without blocking flow.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 Code review is essential for quality, but it is also the most common bottleneck in teams adopting trunk-based development. If reviews take days, daily integration is impossible. This page covers review techniques that maintain quality while enabling the flow that CD requires.
 

@@ -11,7 +11,7 @@ tags:
   - test-strategy
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

@@ -69,6 +69,7 @@ Three classes of doubles need validation, each through a different mechanism:
 
 A test that pins the daily-report window calculation around a DST boundary. The clock is injected so the test deterministically simulates the moment of interest. `source` and `sink` are field-level fakes set up in the test class with seeded data for 2026-03-08 and 2026-03-09.
 
+```java
 @Test
 void daily_report_run_after_DST_spring_forward_uses_correct_window() {
   Clock fixedClock = Clock.fixed(
@@ -86,7 +87,9 @@ void daily_report_run_after_DST_spring_forward_uses_correct_window() {
   assertThat(emitted.recordsProcessed())
       .isEqualTo(source.recordsForDay("2026-03-08"));
 }
+```
 
+```csharp
 [Fact]
 public void Daily_report_run_after_DST_spring_forward_uses_correct_window()
 {
@@ -100,7 +103,9 @@ public void Daily_report_run_after_DST_spring_forward_uses_correct_window()
     emitted.WindowEnd.Should().Be(DateTimeOffset.Parse("2026-03-09T05:00:00Z"));
     emitted.RecordsProcessed.Should().Be(source.RecordsForDay("2026-03-08"));
 }
+```
 
+```javascript
 test("daily report run after DST spring forward uses correct window", () => {
   const fixedClock = { now: () => new Date("2026-03-09T07:30:00Z") };
   const job = new ReportJob({ clock: fixedClock, source, sink });
@@ -112,5 +117,6 @@ test("daily report run after DST spring forward uses correct window", () => {
   expect(emitted.windowEnd).toEqual(new Date("2026-03-09T05:00:00Z"));
   expect(emitted.recordsProcessed).toBe(source.recordsForDay("2026-03-08"));
 });
+```
 
 A separate out-of-band check runs the deployed binary against the real system clock once, to verify the production wiring of the clock dependency matches the doubled clock used here.

@@ -97,6 +97,7 @@ review failures out-of-band.
 
 A narrow end-to-end test verifying a service against a real database:
 
+```javascript
 describe("OrderRepository (real database)", () => {
   it("should persist and retrieve an order by ID", async () => {
     const order = await orderRepository.create({
@@ -110,9 +111,11 @@ describe("OrderRepository (real database)", () => {
     expect(retrieved.status).toBe("pending");
   });
 });
+```
 
 A full-system browser test using a browser automation framework:
 
+```javascript
 test("user can add an item to cart and check out", async ({ page }) => {
   await page.goto("https://staging.example.com");
   await page.getByRole("link", { name: "Running Shoes" }).click();
@@ -124,6 +127,7 @@ test("user can add an item to cart and check out", async ({ page }) => {
   await page.getByRole("button", { name: "Checkout" }).click();
   await expect(page.getByText("Order confirmed")).toBeVisible();
 });
+```
 
 ## Anti-Patterns
 
@@ -146,6 +150,7 @@ test("user can add an item to cart and check out", async ({ page }) => {
 
 End-to-end tests run **after deployment**, not before:
 
+```text
 Stage 1 (every commit)    Unit tests              Deterministic    Blocks
                           Component tests         Deterministic    Blocks
                           Contract tests          Deterministic    Blocks
@@ -154,6 +159,7 @@ Post-deployment           Integration tests       Non-deterministic   Validates 
                           E2E smoke tests         Non-deterministic   Triggers rollback
                           Scheduled E2E suites    Non-deterministic   Review out-of-band
                           Synthetic monitoring    Non-deterministic   Triggers alerts
+```
 
 A team may choose to gate on a small, highly reliable set of vertical end-to-end
 smoke tests immediately after deployment. This is acceptable only if the team invests

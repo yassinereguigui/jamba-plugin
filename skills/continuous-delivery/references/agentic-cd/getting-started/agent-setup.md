@@ -44,6 +44,7 @@ The project context file is a markdown document that every agent reads at the st
 
 Because the project context file loads on every session, every line is a token cost on every invocation. Keep it to stable facts, not procedures. A bloated project context file is an invisible per-session tax.
 
+```text
 # Language and toolchain
 Language: Java 21, Spring Boot 3.2
 
@@ -60,7 +61,9 @@ shared/     cross-cutting concerns - no domain logic here
 src/test/unit/         fast, no I/O
 src/test/integration/  requires running dependencies
 Test class names mirror source class names with a Test suffix
+```
 
+```text
 # Language and toolchain
 Language: Java 21, Spring Boot 3.2
 
@@ -77,7 +80,9 @@ shared/     cross-cutting concerns - no domain logic here
 src/test/unit/         fast, no I/O
 src/test/integration/  requires running dependencies
 Test class names mirror source class names with a Test suffix
+```
 
+```text
 # Language and toolchain
 Language: Java 21, Spring Boot 3.2
 
@@ -94,7 +99,9 @@ shared/     cross-cutting concerns - no domain logic here
 src/test/unit/         fast, no I/O
 src/test/integration/  requires running dependencies
 Test class names mirror source class names with a Test suffix
+```
 
+```text
 # Language and toolchain
 Language: Java 21, Spring Boot 3.2
 
@@ -111,6 +118,7 @@ shared/     cross-cutting concerns - no domain logic here
 src/test/unit/         fast, no I/O
 src/test/integration/  requires running dependencies
 Test class names mirror source class names with a Test suffix
+```
 
 ---
 
@@ -136,6 +144,7 @@ Rules are placed first in every agent's context. This placement is a caching dec
 
 Rules are plain markdown, injected at session start. The content is the same regardless of tool; where it lives differs.
 
+```text
 ## Implementation Rules
 
 Implement exactly one BDD scenario per session.
@@ -148,7 +157,9 @@ If you need a file not provided, request it as:
 Do not infer or reproduce the contents of files not in your context.
 
 Done when: the acceptance test for this scenario passes and all prior tests still pass.
+```
 
+```text
 ## Implementation Rules
 
 Implement exactly one BDD scenario per session.
@@ -161,7 +172,9 @@ If you need a file not provided, request it as:
 Do not infer or reproduce the contents of files not in your context.
 
 Done when: the acceptance test for this scenario passes and all prior tests still pass.
+```
 
+```text
 ## Implementation Rules
 
 Implement exactly one BDD scenario per session.
@@ -174,7 +187,9 @@ If you need a file not provided, request it as:
 Do not infer or reproduce the contents of files not in your context.
 
 Done when: the acceptance test for this scenario passes and all prior tests still pass.
+```
 
+```text
 ## Implementation Rules
 
 Implement exactly one BDD scenario per session.
@@ -187,6 +202,7 @@ If you need a file not provided, request it as:
 Do not infer or reproduce the contents of files not in your context.
 
 Done when: the acceptance test for this scenario passes and all prior tests still pass.
+```
 
 ---
 
@@ -240,6 +256,7 @@ A command is a named invocation - it is how you or the agent triggers a skill. S
 
 A command that runs a multi-step procedure should invoke the skill document by name, not inline the steps. This keeps the command short and the procedure in one place.
 
+```text
 # .claude/commands/review.md
 # Invoked as: /review
 
@@ -247,7 +264,9 @@ Run the pre-commit review gate against all staged changes.
 Pass staged diff, current BDD scenario, and feature description to the review orchestrator.
 Parse the JSON result directly. If "decision" is "block", return findings to the implementation agent.
 Do not commit until /review returns {"decision": "pass"}.
+```
 
+```text
 # .gemini/skills/review.md
 # Invoked as: /review
 
@@ -255,7 +274,9 @@ Run the pre-commit review gate against all staged changes.
 Pass staged diff, current BDD scenario, and feature description to the review orchestrator.
 Parse the JSON result directly. If "decision" is "block", return findings to the implementation agent.
 Do not commit until /review returns {"decision": "pass"}.
+```
 
+```text
 # Defined as a named task section in AGENTS.md
 # Invoked by name in the session prompt
 
@@ -265,7 +286,9 @@ Run the pre-commit review gate against all staged changes.
 Pass staged diff, current BDD scenario, and feature description to the review orchestrator.
 Parse the JSON result directly. If "decision" is "block", return findings to the implementation agent.
 Do not commit until review returns {"decision": "pass"}.
+```
 
+```text
 # .github/review.md
 # Referenced by name in the session prompt
 
@@ -273,6 +296,7 @@ Run the pre-commit review gate against all staged changes.
 Pass staged diff, current BDD scenario, and feature description to the review orchestrator.
 Parse the JSON result directly. If "decision" is "block", return findings to the implementation agent.
 Do not commit until review returns {"decision": "pass"}.
+```
 
 ---
 
@@ -298,6 +322,7 @@ Hooks run before the review agent. If the linter fails, there is no reason to in
 
 Git pre-commit hooks are independent of the AI tool - they run via git regardless of which model you use. Claude Code and Gemini CLI additionally support tool-use hooks in their `settings.json`, which trigger shell commands in response to agent events (for example, running linters automatically when the agent stops). OpenAI Codex and GitHub Copilot do not have an equivalent built-in hook system; use git hooks directly with those tools.
 
+```yaml
 # .pre-commit-config.yaml - runs on git commit, before AI review
 repos:
   - repo: local
@@ -325,7 +350,9 @@ repos:
         entry: semgrep --config auto
         language: system
         pass_filenames: false
+```
 
+```json
 {
   "hooks": {
     "Stop": [
@@ -340,7 +367,9 @@ repos:
     ]
   }
 }
+```
 
+```json
 {
   "hooks": {
     "afterResponse": [
@@ -350,9 +379,12 @@ repos:
     ]
   }
 }
+```
 
+```text
 No built-in tool-use hook system. Use git hooks (.pre-commit-config.yaml)
 alongside these tools - see the "Git hooks (all tools)" tab.
+```
 
 The AI review step (`/review`) runs after these pass. It is invoked by the agent as part of the session workflow, not by the hook sequence directly.
 
@@ -392,6 +424,7 @@ The examples below show how the configuration mechanisms map to Claude Code, Gem
 OpenAI Codex CLI, and GitHub Copilot. The file names and locations differ; the purpose
 of each mechanism does not.
 
+```text
 .claude/
   agents/
     orchestrator.md     # sub-agent definition: system prompt + model for the orchestrator
@@ -404,7 +437,9 @@ of each mechanism does not.
     fix.md              # skill + command: /fix - pipeline-restore mode
   settings.json         # hooks - tool-use event triggers (Stop, PreToolUse, etc.)
 CLAUDE.md               # project context file - facts for all agents
+```
 
+```text
 .gemini/
   skills/
     start-session.md   # skill document - invoked as /start-session
@@ -414,12 +449,16 @@ CLAUDE.md               # project context file - facts for all agents
   settings.json        # hooks - afterResponse and other event triggers
 GEMINI.md              # project context file - facts for all agents
                        # agent configurations injected programmatically at session start
+```
 
+```text
 AGENTS.md   # project context file and named task definitions
             # skills and commands defined as ## Task: name sections
             # agent configurations injected programmatically at session start
             # git hooks handle pre-commit checks (.pre-commit-config.yaml)
+```
 
+```text
 .github/
   copilot-instructions.md   # project context file - facts for all agents
   start-session.md           # skill document - referenced by name in the session
@@ -428,6 +467,7 @@ AGENTS.md   # project context file and named task definitions
   fix.md                     # skill document - referenced by name in the session
                              # agent configurations injected via VS Code extension settings
                              # git hooks handle pre-commit checks (.pre-commit-config.yaml)
+```
 
 The skill and command documents are plain markdown in all cases - the same procedure
 text works across tools because skills are specifications, not code. In Claude Code,
@@ -449,6 +489,7 @@ agent works in a subdirectory, it reads the context file there in addition to th
 root-level file. Area-specific facts stay out of the root file and load only when
 relevant, which reduces per-session token cost for agents working in unrelated areas.
 
+```text
 CLAUDE.md       # repo-wide: language, toolchain, top-level architecture
 src/
   payments/
@@ -457,7 +498,9 @@ src/
     CLAUDE.md   # inventory context: stock rules, warehouse integrations
   api/
     CLAUDE.md   # API layer: auth patterns, rate limiting conventions
+```
 
+```text
 GEMINI.md       # repo-wide: language, toolchain, top-level architecture
 src/
   payments/
@@ -466,7 +509,9 @@ src/
     GEMINI.md   # inventory context: stock rules, warehouse integrations
   api/
     GEMINI.md   # API layer: auth patterns, rate limiting conventions
+```
 
+```text
 AGENTS.md       # repo-wide: language, toolchain, top-level architecture
 src/
   payments/
@@ -475,7 +520,9 @@ src/
     AGENTS.md   # inventory context: stock rules, warehouse integrations
   api/
     AGENTS.md   # API layer: auth patterns, rate limiting conventions
+```
 
+```text
 # GitHub Copilot uses a single .github/copilot-instructions.md
 # Decompose by area using sections within that file
 
@@ -492,6 +539,7 @@ src/
 #
 # ## API layer
 # Auth patterns and rate limiting conventions
+```
 
 **What goes in area-specific files:** Facts that apply only to that area - domain rules,
 local naming conventions, area-specific architecture constraints, and non-obvious

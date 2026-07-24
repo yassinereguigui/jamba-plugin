@@ -9,4 +9,3 @@ description: >
 These anti-patterns affect the automated path from commit to production. They create manual steps,
 slow feedback, and fragile deployments that prevent the reliable, repeatable delivery that
 continuous delivery requires.
-

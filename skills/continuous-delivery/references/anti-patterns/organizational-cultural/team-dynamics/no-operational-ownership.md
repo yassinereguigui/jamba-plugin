@@ -12,7 +12,7 @@ tags:
   - observability
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

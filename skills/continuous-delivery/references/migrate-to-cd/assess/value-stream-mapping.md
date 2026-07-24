@@ -6,7 +6,7 @@ description: >
   Visualize your delivery process end-to-end to identify waste and constraints before starting your CD migration.
 ---
 
-**Phase 0 - Assess** | 
+**Phase 0 - Assess** |
 
 Before you change anything about how your team delivers software, you need to see how it works
 today. Value Stream Mapping (VSM) is the single most effective tool for making your delivery

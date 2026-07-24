@@ -10,7 +10,7 @@ tags:
   - deployment-automation
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 

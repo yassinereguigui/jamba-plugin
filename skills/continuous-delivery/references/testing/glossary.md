@@ -13,7 +13,7 @@ description: >
 These definitions reflect how this site uses each term. They are not universal definitions -
 other communities may use the same words differently.
 
-### Acceptance Tests {#functional-acceptance-tests}
+## Acceptance Tests {#functional-acceptance-tests}
 
 Automated tests that verify a system behaves as specified. Acceptance tests
 exercise user workflows in a
@@ -30,19 +30,19 @@ Referenced in:
 CD Testing,
 Pipeline Reference Architecture
 
-### Adapter Integration Test
+## Adapter Integration Test
 
 A narrow test of a single **boundary adapter** - the team's own HTTP client, database query layer, message-broker client, file-system adapter, or similar - exercised against either the real external dependency or a high-fidelity stand-in like a testcontainer running the production engine. (Legacy name from Toby Clemson: "gateway integration test.")
 
-#### What the test is for
+### What the test is for
 
 The test asserts that **the adapter correctly speaks the protocol**: that it serializes the request the way the dependency expects, parses the response shape correctly, maps errors to the right exception types, propagates headers, enforces timeouts, and handles transactional semantics.
 
-#### What the test is *not* for
+### What the test is *not* for
 
 It does **not** test the behavior of the dependency itself. If the adapter asks for a user, the test validates that the response parses into a valid `User` object - not *which* user comes back, not the dependency's own business rules, not anything that the dependency owns. The dependency's correctness is the dependency's problem; the adapter's job is to speak the protocol faithfully. Conflating the two produces brittle tests that fail on unrelated changes to the dependency's data or logic.
 
-#### Pipeline placement
+### Pipeline placement
 
 Runs [in-band](#in-band-test) **only** when both conditions hold:
 
@@ -51,7 +51,7 @@ Runs [in-band](#in-band-test) **only** when both conditions hold:
 
 For everything else - third-party APIs, services owned by another team, dependencies whose state the team can't reset between runs - the test runs [out-of-band](#out-of-band-test) on a schedule. Out-of-band placement is the default for any adapter test that touches a system outside the team's full control. Failures trigger review, not a build break. Pulling these tests in-band is the most common cause of flaky pipelines.
 
-#### Distinguishing from neighboring test types
+### Distinguishing from neighboring test types
 
 Different from a broader end-to-end test: an adapter integration test isolates one boundary adapter, not a flow across multiple components. Different from a [contract test](#contract-test) at the same boundary: contract tests pin shape against doubles in the pipeline; adapter integration tests pin protocol against the real dependency.
 
@@ -65,14 +65,14 @@ Event Producer,
 Scheduled Job,
 Stateful Service
 
-### API Surface Test
+## API Surface Test
 
 A test that pins the public-facing API of a library or CLI - the exported symbols, their signatures, the documented arguments and exit codes. Typically a snapshot: the current public surface is captured to a file, and any diff fails the build. Catches accidental breaking changes (a renamed function, a removed flag, a tightened type) before they reach consumers. Distinct from a [contract test](#contract-test), which pins the wire boundary between two services; an API surface test pins the source-level boundary between a library and its callers.
 
 Referenced in:
 CLI Tool or Library
 
-### Black Box Testing
+## Black Box Testing
 
 A testing approach where the test exercises code through its public interface and asserts
 only on observable outputs - return values, state changes visible to consumers, or side
@@ -84,14 +84,14 @@ Referenced in:
 CD Testing,
 Unit Tests
 
-### Cluster Test
+## Cluster Test
 
 A test that exercises a stateful service across multiple nodes - replication, leader election, consensus, partition tolerance - against a real multi-node setup, typically via testcontainers running the production consensus library. Cluster tests catch behavior that only appears under a real cluster: split-brain, slow followers, leader transitions, partition reconciliation. Deterministic enough to run [in-band](#in-band-test) but slower than single-node [component tests](#component-test), so usually relegated to a later CI stage.
 
 Referenced in:
 Stateful Service
 
-### Component Test
+## Component Test
 
 A deterministic test that verifies a complete frontend component or backend service through
 its public interface, with test doubles for all external dependencies. See
@@ -103,7 +103,7 @@ End-to-End Tests,
 Tests Randomly Pass or Fail,
 Unit Tests
 
-### Contract Test
+## Contract Test
 
 A deterministic test that verifies the boundary between two systems using [test doubles](#test-double). Sometimes called a *narrow integration test*. Has two perspectives. A **consumer contract test** asks "do the fields and status codes I depend on still exist?" and asserts only on the subset of the API the consumer actually uses. A **provider contract test** asks "have my changes broken any of my consumers?" and runs every consumer's published expectations against the real provider implementation. The same shape applies to broker topics (a "broker contract") and to source-and-sink schemas in pipelines ("source/sink contract") - the test object is the boundary, the perspective is whichever side the test runs from.
 
@@ -116,14 +116,14 @@ Contract Tests,
 Event Consumer,
 Event Producer
 
-### Cross-OS Test Matrix
+## Cross-OS Test Matrix
 
 A CI configuration that runs the existing test suite on each supported operating system rather than a separate test type. The matrix catches platform-specific behavior single-OS tests can't: path separators, line endings, signal-handling differences, locale defaults, file-system case sensitivity. Required for any deployable consumed across multiple OSes - CLI tools, libraries, cross-platform desktop or mobile apps.
 
 Referenced in:
 CLI Tool or Library
 
-### Deployed-binary Test
+## Deployed-binary Test
 
 A test that invokes the actual deployed artifact - the same binary, container image, or package the scheduler, orchestrator, or operator will invoke in production - and asserts on observable behavior at startup or first invocation. Catches what in-process [component tests](#component-test) bypass: configuration loading, secret resolution, signal handling, exit codes, lock acquisition, dependency-version mismatches. Usually a small set; the bulk of behavior is tested in component tests against an in-memory assembled app.
 
@@ -131,14 +131,14 @@ Referenced in:
 CLI Tool or Library,
 Scheduled Job
 
-### Doctest
+## Doctest
 
 An executable test extracted from documentation - typically the README or inline code samples - that runs the documented examples against the real binary or library and fails the build if the examples are broken. Doctests close the gap between "the docs say X works" and "X actually works in the latest build". Most languages have framework support: Python's `doctest` module, Rust's `#[doc]` attribute, and Markdown-based runners for Node and Java.
 
 Referenced in:
 CLI Tool or Library
 
-### In-Band Test
+## In-Band Test
 
 A test that runs **in the delivery pipeline** as part of the commit-to-deploy flow. In-band tests must be deterministic, which means test doubles replace anything that crosses the component boundary - downstream services, message brokers, schedulers, browsers talking to real backends. Failures block the build or the deployment.
 
@@ -150,7 +150,7 @@ Referenced in:
 Applied Testing Strategies,
 Architecting Tests for CD
 
-### Out-of-Band Test
+## Out-of-Band Test
 
 A test that runs **outside the delivery pipeline** on a schedule or post-deploy, exercising real external systems. Out-of-band tests are non-deterministic by design (they depend on the real world) and never gate a commit or merge. Failures trigger review, alerts, or rollback decisions.
 
@@ -161,14 +161,14 @@ Applied Testing Strategies,
 Architecting Tests for CD,
 Integration Tests
 
-### Soak Test
+## Soak Test
 
 A long-running test that exercises a deployed service for hours or days under representative load to catch behavior that only appears with time: memory leaks, unbounded growth, replication-lag drift, slow-burn resource exhaustion. Soak tests are [out-of-band](#out-of-band-test) by design - they don't fit a pre-merge budget. Failures trigger review, not a build break. Often paired with chaos testing (deliberate fault injection during the soak) to validate recovery behavior over time.
 
 Referenced in:
 Stateful Service
 
-### Sociable Unit Test
+## Sociable Unit Test
 
 A [unit test](#solitary-unit-test) that allows real collaborator objects to participate -
 for example, a service object calling a real domain model or value object - while still
@@ -181,7 +181,7 @@ Referenced in:
 Unit Tests,
 Component Tests
 
-### Solitary Unit Test
+## Solitary Unit Test
 
 A unit test that replaces all collaborators with
 [test doubles](#test-double) and exercises a single class or function in complete isolation.
@@ -191,7 +191,7 @@ while still replacing external I/O.
 Referenced in:
 Unit Tests
 
-### Synthetic Monitoring
+## Synthetic Monitoring
 
 Automated scripts that continuously execute realistic user journeys or API calls against a
 live production (or production-like) environment and alert when those journeys fail or degrade.
@@ -204,7 +204,7 @@ Referenced in:
 Architecting Tests for CD,
 End-to-End Tests
 
-### TDD (Test-Driven Development)
+## TDD (Test-Driven Development)
 
 A development practice where tests are written before the production code that makes them
 pass. TDD supports CD by ensuring high test coverage, driving simple design, and producing
@@ -220,7 +220,7 @@ TBD Migration Guide,
 Trunk-Based Development,
 Unit Tests
 
-### Test Double
+## Test Double
 
 A stand-in object that replaces a real production dependency during testing. The term comes from the film industry's "stunt double": just as a stunt double replaces an actor for dangerous scenes, a test double replaces a costly or non-deterministic dependency to make tests fast, isolated, and reliable.
 
@@ -231,7 +231,7 @@ Test doubles let you:
 - **Increase speed** by eliminating slow I/O.
 - **Isolate the system under test** so failures point at the code being tested, not at an external dependency.
 
-#### Types of test doubles
+### Types of test doubles
 
 | Type      | Description | Example use case |
 |-----------|-------------|------------------|
@@ -241,7 +241,7 @@ Test doubles let you:
 | **Mock**  | Pre-programmed with expectations about which calls will be made. Verification happens on the mock itself. | Asserting that `sendEmail()` was called with specific arguments. |
 | **Fake**  | Has a working implementation, but takes shortcuts not suitable for production. | An in-memory database replacing PostgreSQL. |
 
-#### Choosing the right double
+### Choosing the right double
 
 - Use a **stub** when you need to supply data but don't care how it was requested.
 - Use a **spy** when you need to verify call arguments or call count.
@@ -260,7 +260,7 @@ Component Tests,
 Contract Tests,
 Unit Tests
 
-### Virtual Service
+## Virtual Service
 
 A test double that simulates a real external service over the network, responding to HTTP
 requests with pre-configured or recorded responses. Unlike in-process stubs or mocks, a
@@ -275,7 +275,7 @@ Component Tests,
 End-to-End Tests,
 Testing Fundamentals
 
-### White Box Testing
+## White Box Testing
 
 A testing approach where the test has knowledge of and asserts on internal implementation
 details - specific methods called, call order, internal state, or code paths taken. White

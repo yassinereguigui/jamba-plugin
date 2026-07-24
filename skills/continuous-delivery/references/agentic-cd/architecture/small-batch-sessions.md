@@ -65,11 +65,13 @@ At the end of each session, write a summary that future sessions can use. The su
 Session 1 implemented Scenario 1 (client exceeds rate limit returns 429).
 
 Files created:
+
 - src/redis.ts - Redis client with connection pooling
 - src/middleware/rate-limit.ts - middleware that checks request count
   against Redis and returns 429 with Retry-After header when exceeded
 
 Tests added:
+
 - src/middleware/rate-limit.test.ts - covers Scenario 1
 
 All pipeline checks pass.
@@ -146,11 +148,13 @@ Scenario 4: Unauthenticated requests bypass rate limiting
 Session 1 implemented Scenario 1 (client within rate limit).
 
 Files created:
+
 - src/redis.ts - Redis client, connection pooling, configured from env
 - src/middleware/rate-limit.ts - reads client ID from JWT, increments
   Redis counter for current window, sets X-RateLimit-Remaining header
 
 Tests added:
+
 - src/middleware/rate-limit.test.ts - covers Scenario 1
 
 Pipeline is green.
@@ -180,12 +184,14 @@ Pipeline is green.
 Sessions 1-2 implemented Scenarios 1 and 2.
 
 Files:
+
 - src/redis.ts - Redis client (unchanged from Session 1)
 - src/middleware/rate-limit.ts - checks counter against limit of 100;
   returns 429 with Retry-After header when exceeded, quota headers when
   within limit
 
 Tests:
+
 - src/middleware/rate-limit.test.ts - covers Scenarios 1 and 2
 
 Pipeline is green.

@@ -7,4 +7,3 @@ description: >
 ---
 
 Start here. These pages cover the configuration, skills, and prerequisites teams need before agents can safely contribute to the delivery pipeline.
-

@@ -6,7 +6,7 @@ description: >
   Real-world stories from teams that have made the journey to continuous deployment.
 ---
 
-**Phase 4 - Deliver on Demand** | 
+**Phase 4 - Deliver on Demand** |
 
 Theory is necessary but insufficient. This page collects experience reports from organizations that have adopted continuous deployment at scale, including the challenges they faced, the approaches they took, and the results they achieved. These reports demonstrate that CD is not limited to startups or greenfield projects - it works in large, complex, regulated environments.
 

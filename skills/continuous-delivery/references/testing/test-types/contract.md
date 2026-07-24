@@ -47,10 +47,12 @@ object should not assert on `address` or `phone`. This allows providers to add n
 freely without breaking consumers.
 
 Following Postel's Law - "be conservative in what you send, be liberal in what you accept"
+
 - consumer tests should accept any valid response that contains the fields they need, and
 tolerate fields they do not use.
 
 What a consumer is trying to discover:
+
 - Has the provider changed or removed a field I depend on?
 - Has the provider changed a type I expect (string to integer, object to array)?
 - Has the provider changed a status code I handle?
@@ -67,6 +69,7 @@ expectations of every known consumer. This gives early warning - before any cons
 deploys and discovers the breakage - that a change is breaking.
 
 What a provider is trying to discover:
+
 - Have I removed or renamed a field that a consumer depends on?
 - Have I changed a type in a way that breaks deserialization for a consumer?
 - Have I changed error behavior (status codes, error formats) that consumers handle?
@@ -143,6 +146,7 @@ schema and then adopt CDC tooling as the number of consumers grows.
 
 A consumer contract test using a consumer-driven contract tool:
 
+```javascript
 describe("Order Service - Inventory Provider Contract", () => {
   it("should receive stock availability in the expected format", async () => {
     // Define what the consumer expects from the provider
@@ -165,9 +169,11 @@ describe("Order Service - Inventory Provider Contract", () => {
     expect(result.available).toBe(true);
   });
 });
+```
 
 A provider verification test that runs consumer expectations against the real implementation:
 
+```javascript
 describe("Inventory Service - Provider Verification", () => {
   it("should satisfy all registered consumer contracts", async () => {
     await contractBroker.verifyProvider({
@@ -178,9 +184,11 @@ describe("Inventory Service - Provider Verification", () => {
     });
   });
 });
+```
 
 A contract-first schema validation test verifying a provider response against an OpenAPI spec:
 
+```javascript
 // The OpenAPI document is the source of truth. Validate the whole response
 // against the named schema rather than hand-checking individual fields - a
 // field-by-field check drifts from the spec the moment the spec changes.
@@ -199,6 +207,7 @@ describe("GET /stock/:id - OpenAPI contract", () => {
     expect(result.errors).toEqual([]);
   });
 });
+```
 
 ## Anti-Patterns
 
@@ -221,12 +230,14 @@ describe("GET /stock/:id - OpenAPI contract", () => {
 
 Contract tests run **on every commit** as part of the deterministic pipeline:
 
+```text
 On every commit          Unit tests              Deterministic    Blocks
                          Component tests         Deterministic    Blocks
                          Contract tests          Deterministic    Blocks
 
 Post-deployment          Integration tests       Non-deterministic   Validates contract doubles
                          E2E smoke tests         Non-deterministic   Triggers rollback
+```
 
 Contract tests verify that your boundary layer code correctly interacts with the
 interfaces you depend on. Integration tests

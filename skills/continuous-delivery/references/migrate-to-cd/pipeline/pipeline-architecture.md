@@ -6,7 +6,7 @@ description: >
   Design efficient quality gates for your delivery system's context.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 

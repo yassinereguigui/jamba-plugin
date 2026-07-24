@@ -20,4 +20,3 @@ these problems? Let's learn why.
 ## Anti-pattern index
 
 Sorted by quality impact so you can prioritize what to fix first.
-

@@ -6,7 +6,7 @@ description: >
   Break features into small, deliverable increments that can be completed in 2 days or less.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 Trunk-based development requires daily integration, and daily integration requires small work. This page covers the techniques for breaking work into small, deliverable increments that flow through your pipeline continuously.
 
@@ -126,12 +126,12 @@ BDD scenarios are the most reliable way to find slice boundaries. Each Given-Whe
 Feature: User login
 
   Scenario: Successful login with valid credentials
-    Given a registered user with email "user@example.com"
+    Given a registered user with email "<user@example.com>"
     When they enter their correct password and click "Log in"
     Then they are redirected to the dashboard
 
   Scenario: Failed login with wrong password
-    Given a registered user with email "user@example.com"
+    Given a registered user with email "<user@example.com>"
     When they enter an incorrect password and click "Log in"
     Then they see the message "Invalid email or password"
     And they remain on the login page

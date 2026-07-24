@@ -6,7 +6,7 @@ description: >
   The same inputs to the pipeline always produce the same outputs.
 ---
 
-**Phase 2 - Pipeline** | 
+**Phase 2 - Pipeline** |
 
 ## Definition
 
@@ -95,6 +95,7 @@ Seeing anti-patterns and good patterns side by side makes the difference concret
 
 ### Anti-Pattern: Non-Deterministic Pipeline
 
+```yaml
 # Bad: Uses floating versions
 dependencies:
   nodejs: "latest"
@@ -114,12 +115,14 @@ test('shows current date', () => {
 deploy:
   - echo "Manually verify staging before approving"
   - wait_for_approval
+```
 
 Results vary based on when the pipeline runs, what is in production, which dependency
 versions are "latest," and human availability.
 
 ### Good Pattern: Deterministic Pipeline
 
+```yaml
 # Good: Pinned versions
 dependencies:
   nodejs: "18.17.1"
@@ -144,6 +147,7 @@ deploy:
   - run_smoke_tests
   - if: smoke_tests_pass
     deploy_to_production
+```
 
 Same inputs always produce same outputs. Pipeline results are trustworthy and
 reproducible.
@@ -219,6 +223,7 @@ pipeline runs.
 
 Define your build environment as a versioned container image with every dependency pinned:
 
+```dockerfile
 # Dockerfile.build - version controlled
 FROM node:18.17.1-alpine3.18
 
@@ -229,6 +234,7 @@ RUN apk add --no-cache \
 WORKDIR /app
 COPY package-lock.json .
 RUN npm ci --frozen-lockfile
+```
 
 Every build runs inside a fresh instance of this image. No drift, no accumulated state.
 
@@ -236,6 +242,7 @@ Every build runs inside a fresh instance of this image. No drift, no accumulated
 
 Always use dependency lockfiles. This is essential for deterministic builds:
 
+```json
 // package-lock.json (ALWAYS commit to version control)
 {
   "dependencies": {
@@ -246,6 +253,7 @@ Always use dependency lockfiles. This is essential for deterministic builds:
     }
   }
 }
+```
 
 Rules for lockfiles:
 
@@ -259,6 +267,7 @@ Rules for lockfiles:
 When a flaky test is detected, move it to quarantine immediately. Do not leave it in the
 main suite where it erodes trust in the pipeline:
 
+```javascript
 // tests/quarantine/flaky-test.spec.js
 describe.skip('Quarantined: Flaky integration test', () => {
   // Quarantined due to intermittent timeout
@@ -268,6 +277,7 @@ describe.skip('Quarantined: Flaky integration test', () => {
     // Test code
   })
 })
+```
 
 Quarantine is not a permanent home. Every quarantined test must have:
 
@@ -281,6 +291,7 @@ If a quarantined test cannot be fixed by the deadline, delete it and write a bet
 
 Give each pipeline run a fresh, isolated environment with no shared state:
 
+```yaml
 # GitHub Actions example
 jobs:
   test:
@@ -296,6 +307,7 @@ jobs:
       - run: npm ci
       - run: npm test
       # Each workflow run gets a fresh database
+```
 
 ## How to Get Started
 
@@ -345,10 +357,12 @@ failure, not succeeding. Fix the flakiness instead of retrying.
 
 Seed your random number generators with a fixed seed in tests:
 
+```javascript
 // Deterministic randomness
 const rng = new Random(12345) // Fixed seed
 const result = shuffle(array, rng)
 expect(result).toEqual([3, 1, 4, 2]) // Predictable
+```
 
 ### What if our deployment requires manual verification?
 

@@ -6,7 +6,7 @@ description: >
   Build a test architecture that gives your pipeline the confidence to deploy any change, even when dependencies outside your control are unavailable.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 Continuous delivery requires that trunk always be releasable, which means testing it automatically on every change. A collection of tests is not enough. You need a **test architecture**: different test types working together so the pipeline can confidently deploy any change, even when external systems are unavailable.
 

@@ -6,7 +6,7 @@ description: >
   Capture baseline CI and DORA metrics before making any changes so you have an honest starting point and can measure progress.
 ---
 
-**Phase 0 - Assess** | 
+**Phase 0 - Assess** |
 
 You cannot improve what you have not measured. Before making any changes to your delivery process,
 capture two types of baseline measurements: CI health metrics and DORA outcome metrics.

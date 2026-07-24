@@ -7,4 +7,3 @@ description: >
 ---
 
 Start with what hurts, then drill into specifics. The selector finds anti-patterns driving multiple symptoms at once.
-

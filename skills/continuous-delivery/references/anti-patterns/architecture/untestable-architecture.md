@@ -12,7 +12,7 @@ tags:
   - test-strategy
 ---
 
-**Category:**  | 
+**Category:**  |
 
 ## What This Looks Like
 
@@ -145,6 +145,7 @@ changing behavior.
 
 In Java:
 
+```java
 // Before: untestable - constructs dependency internally
 public class OrderService {
     public void processOrder(Order order) {
@@ -164,9 +165,11 @@ public class OrderService {
         this.paymentGateway = paymentGateway;
     }
 }
+```
 
 In JavaScript:
 
+```javascript
 // Before: untestable
 function processOrder(order) {
   const db = new DatabaseConnection();
@@ -178,6 +181,7 @@ function processOrder(order) {
 function processOrder(order, { repository, paymentGateway }) {
   // business logic using injected dependencies
 }
+```
 
 The interface or abstraction is the key. Production code passes real implementations. Tests pass
 fast, in-memory doubles that return predictable results.
@@ -203,6 +207,7 @@ including tests.
 
 A serverless handler that does everything:
 
+```javascript
 // Before: untestable
 exports.handler = async (event) => {
   const db = new Database();
@@ -223,6 +228,7 @@ exports.handler = async (event, { db } = { db: new Database() }) => {
   await db.updateOrder({ ...order, discount });
   return { statusCode: 200 };
 };
+```
 
 The `calculateDiscount` function is now testable in complete isolation. The handler is thin and can
 be tested with a mock database.

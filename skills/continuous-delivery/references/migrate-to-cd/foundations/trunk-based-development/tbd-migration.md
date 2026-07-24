@@ -6,7 +6,7 @@ description: >
   A tactical guide for migrating from GitFlow or long-lived branches to trunk-based development, covering regulated environments, multi-team coordination, and common pitfalls.
 ---
 
-**Phase 1 - Foundations** | 
+**Phase 1 - Foundations** |
 
 This is a detailed companion to the Trunk-Based Development overview. It covers specific migration paths, regulated environment guidance, multi-team strategies, and concrete scenarios.
 
@@ -125,6 +125,7 @@ This approach is called **Behavior-Driven Development (BDD)**, a collaborative p
 
 **Example:**
 
+```text
 Feature: User password reset
 
 Scenario: Valid reset request
@@ -144,6 +145,7 @@ Scenario: Expired link
   When they click the link
   Then they see "This reset link has expired"
   And they are prompted to request a new one
+```
 
 These scenarios become your automated acceptance tests *before* you write any implementation code.
 
@@ -151,6 +153,7 @@ These scenarios become your automated acceptance tests *before* you write any im
 
 Turn those scenarios into executable tests in your framework of choice:
 
+```javascript
 // Example using Jest and Supertest
 describe('Password Reset', () => {
   it('sends reset email for valid user', async () => {
@@ -175,6 +178,7 @@ describe('Password Reset', () => {
     expect(emailService.sentEmails).toHaveLength(0);
   });
 });
+```
 
 Now you can write the minimum code to make these tests pass. This drives smaller, more focused changes.
 
@@ -242,6 +246,7 @@ You don't need a sophisticated feature flag system to start. Begin with environm
 
 **Simple boolean flag example:**
 
+```javascript
 // config/features.js
 module.exports = {
   newCheckoutFlow: process.env.FEATURE_NEW_CHECKOUT === 'true',
@@ -257,6 +262,7 @@ app.get('/checkout', (req, res) => {
   }
   return renderOldCheckout(req, res);
 });
+```
 
 This is enough for most TBD use cases.
 
@@ -264,6 +270,7 @@ This is enough for most TBD use cases.
 
 Critical: You must test **both** code paths, flag on and flag off.
 
+```javascript
 describe('Checkout flow', () => {
   describe('with new checkout flow enabled', () => {
     beforeEach(() => {
@@ -285,6 +292,7 @@ describe('Checkout flow', () => {
     });
   });
 });
+```
 
 If you only test with the flag on, you'll break production when the flag is off.
 
@@ -501,6 +509,7 @@ Define the contract you need from the upstream service and codify it in tests th
 
 **Example using Pact:**
 
+```javascript
 // Your consumer test
 const { pact } = require('@pact-foundation/pact');
 
@@ -527,6 +536,7 @@ describe('User Service Contract', () => {
     expect(user.name).toBe('Jane Doe');
   });
 });
+```
 
 This test runs against your expectations of the API, not the actual service. When the upstream team changes their API, your contract test fails *before* you integrate their changes.
 
@@ -540,6 +550,7 @@ This test runs against your expectations of the API, not the actual service. Whe
 
 If you control the shared service:
 
+```javascript
 // Support both old and new API versions
 app.get('/api/v1/users/:id', handleV1Users);
 app.get('/api/v2/users/:id', handleV2Users);
@@ -552,6 +563,7 @@ app.get('/api/users/:id', (req, res) => {
   }
   return handleV1Users(req, res);
 });
+```
 
 **Migration path:**
 
@@ -568,6 +580,7 @@ When you depend on a team that won't change:
 2. Define your ideal interface in the adapter
 3. Let the adapter handle their messy API
 
+```javascript
 // Your ideal interface
 class UserRepository {
   async getUser(id) {
@@ -589,6 +602,7 @@ class LegacyUserServiceAdapter extends UserRepository {
     };
   }
 }
+```
 
 Now your code depends on *your* interface, not theirs. When they change, you only update the adapter.
 
@@ -676,10 +690,12 @@ This approach satisfies both regulatory requirements and continuous integration 
 
 Every commit references the change ticket:
 
+```bash
 git commit -m "JIRA-1234: Add validation for SSN input
 
 Implements requirement REQ-445 from Q4 compliance review.
 Changes limited to user input validation layer."
+```
 
 Modern Git hosting platforms (GitHub, GitLab, Bitbucket) automatically track:
 
@@ -710,6 +726,7 @@ This provides stronger separation of duties than long-lived branches because:
 
 Branch protection rules enforce your process:
 
+```yaml
 # Example GitHub branch protection for trunk
 required_reviews: 1
 required_checks:
@@ -718,6 +735,7 @@ required_checks:
   - compliance-validation
 dismiss_stale_reviews: true
 require_code_owner_review: true
+```
 
 This ensures:
 
@@ -730,6 +748,7 @@ This ensures:
 
 Pull request templates enforce documentation:
 
+```text
 ## Change Description
 [Link to Jira ticket]
 
@@ -746,6 +765,7 @@ Pull request templates enforce documentation:
 
 ## Rollback Plan
 [How to rollback if this causes issues in production]
+```
 
 ### What "Short-Lived" Means in Practice
 
@@ -1052,6 +1072,7 @@ Create a `feature/notifications` branch. Work for three weeks. Submit a massive 
 
 **First commit:** Define notification interface, commit to trunk
 
+```javascript
 // notifications/NotificationService.js
 // Contract: all implementations must provide send(userId, message)
 // message shape: { title, body, priority } where priority is 'low', 'normal', or 'high'
@@ -1061,11 +1082,13 @@ class NotificationService {
     throw new Error('Not implemented');
   }
 }
+```
 
 This compiles but doesn't do anything yet. That's fine.
 
 **Next commit:** Add in-memory implementation for testing
 
+```javascript
 class InMemoryNotificationService extends NotificationService {
   constructor() {
     super();
@@ -1076,11 +1099,13 @@ class InMemoryNotificationService extends NotificationService {
     this.notifications.push(message);
   }
 }
+```
 
 Now other teams can use the interface in their code and tests.
 
 **Then:** Implement email notifications behind a feature flag
 
+```javascript
 class EmailNotificationService extends NotificationService {
   async send(userId, message) {
     if (!features.emailNotifications) {
@@ -1089,6 +1114,7 @@ class EmailNotificationService extends NotificationService {
     // Real email sending implementation
   }
 }
+```
 
 Commit daily. Deploy. Flag is off in production.
 
@@ -1115,14 +1141,17 @@ Update schema, update all code, deploy everything at once. Hope nothing breaks.
 **Step 1: Expand**
 Add new columns without removing the old one:
 
+```sql
 ALTER TABLE users ADD COLUMN first_name VARCHAR(255);
 ALTER TABLE users ADD COLUMN last_name VARCHAR(255);
+```
 
 Commit and deploy. Application still uses `name` column. No breaking change.
 
 **Step 2: Dual writes**
 Update write path to populate both old and new columns:
 
+```javascript
 async function createUser(name) {
   const [firstName, lastName] = name.split(' ');
   await db.query(
@@ -1130,12 +1159,14 @@ async function createUser(name) {
     [name, firstName, lastName]
   );
 }
+```
 
 Commit and deploy. Now new data populates both formats.
 
 **Step 3: Backfill**
 Migrate existing data in the background:
 
+```javascript
 async function backfillNames() {
   const users = await db.query('SELECT id, name FROM users WHERE first_name IS NULL');
   for (const user of users) {
@@ -1146,12 +1177,14 @@ async function backfillNames() {
     );
   }
 }
+```
 
 Run this as a background job. Commit and deploy.
 
 **Step 4: Read from new columns**
 Update read path behind a feature flag:
 
+```javascript
 async function getUser(id) {
   const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);
   if (features.useNewNameColumns) {
@@ -1162,13 +1195,16 @@ async function getUser(id) {
   }
   return { name: user.name };
 }
+```
 
 Deploy and gradually enable the flag.
 
 **Step 5: Contract**
 Once all reads use new columns and flag is removed:
 
+```sql
 ALTER TABLE users DROP COLUMN name;
+```
 
 **Result:** Five deployments instead of one big-bang change. Each step was reversible. Zero downtime.
 
@@ -1182,6 +1218,7 @@ Your authentication code is a mess. You want to refactor it without breaking pro
 **Characterization tests**
 Write tests that capture current behavior (warts and all):
 
+```javascript
 describe('Current auth behavior', () => {
   it('accepts password with special characters', () => {
     // Document what currently happens
@@ -1191,12 +1228,14 @@ describe('Current auth behavior', () => {
     // Capture edge case behavior
   });
 });
+```
 
 These tests document how the system *actually* works. Commit.
 
 **Strangler fig pattern**
 Create new implementation alongside old one:
 
+```javascript
 class LegacyAuthService {
   // Existing messy code (don't touch it)
 }
@@ -1218,26 +1257,31 @@ class AuthServiceRouter {
     return this.legacy.authenticate(credentials);
   }
 }
+```
 
 Commit with flag off. Old behavior unchanged.
 
 **Migrate piece by piece**
 Enable modern auth for one endpoint at a time:
 
+```javascript
 if (features.modernAuth && endpoint === '/api/users') {
   return modernAuth.authenticate(credentials);
 }
+```
 
 Commit daily. Monitor each endpoint.
 
 **Remove old code**
 Once all endpoints use modern auth and it has been stable:
 
+```javascript
 class AuthService {
   async authenticate(credentials) {
     // Just the modern implementation
   }
 }
+```
 
 Delete the legacy code entirely.
 
@@ -1253,6 +1297,7 @@ A third-party API you depend on is changing their response format next month.
 **Adapter pattern**
 Create an adapter that normalizes both old and new formats:
 
+```javascript
 class PaymentAPIAdapter {
   async getPaymentStatus(orderId) {
     const response = await fetch(`https://api.payments.com/orders/${orderId}`);
@@ -1274,12 +1319,14 @@ class PaymentAPIAdapter {
     }
   }
 }
+```
 
 Commit. Your code now works with both formats.
 
 **After the API migration:**
 Simplify adapter to only handle new format:
 
+```javascript
 async getPaymentStatus(orderId) {
   const response = await fetch(`https://api.payments.com/orders/${orderId}`);
   const data = await response.json();
@@ -1288,6 +1335,7 @@ async getPaymentStatus(orderId) {
     amount: data.amounts.total,
   };
 }
+```
 
 **Result:** No coupling between your deployment schedule and the external API migration. Zero downtime.
 
