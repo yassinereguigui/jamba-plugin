@@ -8,6 +8,8 @@ packaged as a single Claude Code plugin.
 ```
 jamba-plugin/
 ├── .claude-plugin/plugin.json   # manifest (name, version, author)
+├── skills/api-design/           # API design patterns (multi-file, references/)
+├── skills/continuous-delivery/  # CD & delivery patterns (multi-file, references/)
 ├── skills/<name>/SKILL.md       # skills — model- or user-invoked, namespaced /jamba-plugin:<name>
 ├── agents/<name>.md             # subagents — invoked via @<name>
 ├── hooks/hooks.json             # event handlers (PreToolUse, PostToolUse, etc.)

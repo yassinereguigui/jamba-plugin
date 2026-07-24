@@ -1,0 +1,234 @@
+---
+title: "Contract Tests"
+linkTitle: "Contract Tests"
+weight: 2
+aliases:
+  - /docs/reference/testing/contract/
+  - /docs/testing/contract/
+description: >
+  Deterministic tests that verify interface boundaries with external systems using test doubles. Also called narrow integration tests. Validated by integration tests running against real systems.
+---
+
+## Definition
+
+A contract test (also called a **narrow integration test**) is a deterministic test that
+validates your code's interaction with an external system's interface using
+test doubles. It verifies that the boundary
+layer code - HTTP clients, database query layers, message producers - correctly handles
+the expected request/response shapes, field names, types, and status codes.
+
+A contract test validates **interface structure, not business behavior**. It answers
+"does my code correctly interact with the interface I expect?" not "is the logic correct?"
+Business logic belongs in component tests.
+
+Because contract tests use test doubles rather than live systems, they are
+**deterministic** and run on every commit as part of the pipeline. They block the build
+on failure, just like unit and component tests.
+
+Integration tests validate that contract
+test doubles still match the real external systems by running against live dependencies
+post-deployment.
+
+## Consumer and Provider Perspectives
+
+Every contract has two sides. The questions each side is trying to answer are different.
+
+### Consumer contract testing
+
+The **consumer** is the service or component that depends on an external API. A consumer
+contract test asks:
+
+> **"Do the fields I depend on still exist, in the types I expect, with the status codes
+> I handle?"**
+
+Consumer tests assert only on the **subset of the API the consumer actually uses** - not
+everything the provider exposes. A consumer that only needs `id` and `email` from a user
+object should not assert on `address` or `phone`. This allows providers to add new fields
+freely without breaking consumers.
+
+Following Postel's Law - "be conservative in what you send, be liberal in what you accept"
+- consumer tests should accept any valid response that contains the fields they need, and
+tolerate fields they do not use.
+
+What a consumer is trying to discover:
+- Has the provider changed or removed a field I depend on?
+- Has the provider changed a type I expect (string to integer, object to array)?
+- Has the provider changed a status code I handle?
+- Does the provider still accept the request format I send?
+
+### Provider contract testing
+
+The **provider** is the service that owns the API. A provider contract test asks:
+
+> **"Have my changes broken any of my consumers?"**
+
+A provider runs contract tests to verify that its API responses still satisfy the
+expectations of every known consumer. This gives early warning - before any consumer
+deploys and discovers the breakage - that a change is breaking.
+
+What a provider is trying to discover:
+- Have I removed or renamed a field that a consumer depends on?
+- Have I changed a type in a way that breaks deserialization for a consumer?
+- Have I changed error behavior (status codes, error formats) that consumers handle?
+- Is my API still backward compatible with all published consumer expectations?
+
+## Approaches to Contract Testing
+
+### Consumer-driven contract development
+
+In **consumer-driven contracts (CDC)**, the consumer writes the contract. The consumer
+defines their expectations as executable tests - what request they will send and what
+response shape they require. These expectations are published to a shared contract broker and the provider runs them
+as part of their own build.
+
+The flow:
+
+1. Consumer team writes tests defining their expectations against a mock provider.
+2. The consumer tests generate a contract artifact.
+3. The contract is published to a shared contract broker.
+4. The provider team runs the consumer's contract expectations against their real
+   implementation.
+5. If the provider's implementation satisfies the contract, the provider can deploy
+   with confidence it will not break this consumer. If not, the teams negotiate before
+   merging the breaking change.
+
+CDC works well for **evolving systems**: it grounds the API design in actual consumer
+needs rather than the provider's assumptions about what consumers will use.
+
+### Contract-first development
+
+In **contract-first development**, the interface is defined as a formal artifact -
+an OpenAPI specification, a Protobuf schema, an Avro schema, or similar - before
+any implementation is written. Both the consumer and provider code are generated from
+or validated against that artifact.
+
+The flow:
+
+1. Teams agree on the interface contract (usually during design or story refinement).
+2. The contract is committed to version control.
+3. Consumer and provider teams develop independently, each generating or validating
+   their code against the contract.
+4. Tests on both sides verify conformance to the contract - not to each other's
+   implementation.
+
+Contract-first works well for **new APIs and parallel development**: it lets consumer
+and provider teams work simultaneously without waiting for a real implementation, and
+makes the interface an explicit design decision rather than an emergent one.
+
+### Choosing between them
+
+| Situation | Prefer |
+|-----------|--------|
+| Existing API with multiple consumers, evolving over time | Consumer-driven (CDC) |
+| New API, teams working in parallel | Contract-first |
+| Third-party API you do not control | Consumer-only contract tests (no provider side) |
+| Public API with external consumers you cannot reach | Provider tests against published spec |
+
+The two approaches are not mutually exclusive. A team may define an initial contract-first
+schema and then adopt CDC tooling as the number of consumers grows.
+
+## Characteristics
+
+| Property        | Value                                             |
+|-----------------|---------------------------------------------------|
+| **Speed**       | Milliseconds to seconds                           |
+| **Determinism** | Always deterministic (uses test doubles)          |
+| **Scope**       | Interface boundary between two systems            |
+| **Dependencies**| All replaced with test doubles                    |
+| **Network**     | None or localhost only                            |
+| **Database**    | None                                              |
+| **Breaks build**| Yes                                               |
+
+## Examples
+
+A consumer contract test using a consumer-driven contract tool:
+
+describe("Order Service - Inventory Provider Contract", () => {
+  it("should receive stock availability in the expected format", async () => {
+    // Define what the consumer expects from the provider
+    await contractTool.addInteraction({
+      state: "item-42 is in stock",
+      uponReceiving: "a request for item-42 stock",
+      withRequest: { method: "GET", path: "/stock/item-42" },
+      willRespondWith: {
+        status: 200,
+        body: {
+          // Only assert on fields the consumer actually uses
+          available: matchType(true),   // boolean
+          quantity: matchType(10),      // integer
+        },
+      },
+    });
+
+    // Exercise the consumer code against the mock provider
+    const result = await inventoryClient.checkStock("item-42");
+    expect(result.available).toBe(true);
+  });
+});
+
+A provider verification test that runs consumer expectations against the real implementation:
+
+describe("Inventory Service - Provider Verification", () => {
+  it("should satisfy all registered consumer contracts", async () => {
+    await contractBroker.verifyProvider({
+      provider: "InventoryService",
+      providerBaseUrl: "http://localhost:3001",
+      brokerUrl: "https://contract-broker.internal",
+      providerVersion: process.env.GIT_SHA,
+    });
+  });
+});
+
+A contract-first schema validation test verifying a provider response against an OpenAPI spec:
+
+// The OpenAPI document is the source of truth. Validate the whole response
+// against the named schema rather than hand-checking individual fields - a
+// field-by-field check drifts from the spec the moment the spec changes.
+const validator = openApiValidator(openApiSpec);
+
+describe("GET /stock/:id - OpenAPI contract", () => {
+  it("should return a response conforming to the published schema", async () => {
+    const response = await fetch("http://localhost:3001/stock/item-42");
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+
+    // Asserts structure, types, required fields, and additionalProperties
+    // rules exactly as the OpenAPI schema declares them.
+    const result = validator.validate(body, "StockResponse");
+    expect(result.errors).toEqual([]);
+  });
+});
+
+## Anti-Patterns
+
+- **Asserting on business logic**: contract tests verify structure, not behavior. A contract
+  test that asserts `quantity > 0` when in stock is crossing into business logic territory.
+  That belongs in component tests.
+- **Asserting on fields the consumer does not use**: over-specified consumer contracts make
+  providers brittle. Only assert on what your code actually reads.
+- **Testing specific data values**: asserting that `name` equals `"Alice"` makes the test
+  brittle. Assert on types, required fields, and status codes instead.
+- **Hitting live systems in contract tests**: contract tests must use test doubles to stay
+  deterministic. Validating doubles against live systems is the role of
+  integration tests, which run post-deployment.
+- **Running infrequently**: contract tests should run often enough to catch drift before it
+  causes a production incident. High-volatility APIs may need hourly runs.
+- **Skipping provider verification in CDC**: publishing consumer expectations is only half
+  the pattern. The provider must actually run those expectations for CDC to work.
+
+## Connection to CD Pipeline
+
+Contract tests run **on every commit** as part of the deterministic pipeline:
+
+On every commit          Unit tests              Deterministic    Blocks
+                         Component tests         Deterministic    Blocks
+                         Contract tests          Deterministic    Blocks
+
+Post-deployment          Integration tests       Non-deterministic   Validates contract doubles
+                         E2E smoke tests         Non-deterministic   Triggers rollback
+
+Contract tests verify that your boundary layer code correctly interacts with the
+interfaces you depend on. Integration tests
+validate that those test doubles still match the real external systems by running
+against live dependencies post-deployment.
