@@ -120,7 +120,7 @@ schema:
 
 OpenAPI 3.2.0 is a non-breaking upgrade from 3.1 (no removal of existing features).
 
-**Hierarchical Tags**
+#### Hierarchical Tags
 
 ```yaml
 tags:
@@ -133,7 +133,7 @@ tags:
 
 Enables documentation rendering with collapsible tag hierarchies. Previously required vendor extensions.
 
-**First-Class Streaming Support**
+#### First-Class Streaming Support
 
 ```yaml
 responses:
@@ -149,7 +149,8 @@ responses:
 
 Native description of SSE and streaming responses without hacks.
 
-**QUERY Method**
+#### QUERY Method
+
 A new HTTP method concept: `QUERY` (from the IETF HTTP Working Group draft). A semantically safe, idempotent method that accepts a request body — the long-sought "GET with body" solution.
 
 ```yaml
@@ -163,7 +164,7 @@ paths:
               $ref: '#/components/schemas/ProductFilter'
 ```
 
-**OAuth 2.0 Device Authorization Flow**
+#### OAuth 2.0 Device Authorization Flow
 
 ```yaml
 securitySchemes:

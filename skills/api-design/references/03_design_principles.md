@@ -38,7 +38,7 @@ REST resource design centers on modeling entities as nouns, not actions. The HTT
 
 **Wrong:**
 
-```
+```http
 POST /getUser
 POST /createOrder
 POST /cancelSubscription
@@ -46,7 +46,7 @@ POST /cancelSubscription
 
 **Right:**
 
-```
+```http
 GET    /users/{id}
 POST   /orders
 DELETE /subscriptions/{id}
@@ -62,7 +62,7 @@ The key principle: even action endpoints should be noun-like in their resource p
 
 ### URL Conventions
 
-```
+```http
 # Resource collections — always plural
 GET /users
 GET /products
@@ -83,7 +83,7 @@ GET /users/{id}/orders/{orderId}
 
 **Query strings:**
 
-```
+```http
 # Filtering
 GET /orders?status=pending&customerId=c-123
 
@@ -126,7 +126,7 @@ GET /orders?cursor=eyJpZCI6MTIzfQ&limit=20
 
 **PUT vs. PATCH:**
 
-```
+```http
 # PUT — replace the entire resource (idempotent full replacement)
 PUT /users/123
 { "name": "Alice", "email": "alice@example.com", "role": "admin" }
@@ -142,7 +142,7 @@ If your API uses PUT to mean "partial update," it's wrong. Clients that send `PU
 
 **POST for creation vs. action:**
 
-```
+```http
 # Creating a resource — POST to collection
 POST /orders
 { "customerId": "c-123", "items": [...] }
@@ -182,7 +182,7 @@ In practice, many APIs use 400 for both — this is common enough to not be a ha
 
 ### Offset Pagination
 
-```
+```http
 GET /orders?offset=100&limit=20
 ```
 
@@ -202,7 +202,7 @@ SELECT * FROM orders ORDER BY created_at DESC LIMIT 20 OFFSET 100;
 
 ### Cursor/Keyset Pagination
 
-```
+```http
 # First page
 GET /orders?limit=20
 
@@ -263,7 +263,7 @@ This is the standard pattern for GraphQL APIs. The `totalCount` field is optiona
 
 ### Page-Based Pagination
 
-```
+```http
 GET /reports?page=3&pageSize=50
 ```
 
@@ -277,13 +277,13 @@ A variant of offset where clients specify page number. Identical performance cha
 
 Simple equality filters via query parameters:
 
-```
+```http
 GET /orders?status=pending&customerId=c-123
 ```
 
 Range filters — various conventions (no universal standard):
 
-```
+```http
 # Convention 1: Suffix operators
 GET /orders?createdAt[gte]=2024-01-01&createdAt[lte]=2024-12-31
 
@@ -298,7 +298,7 @@ No convention has won. Pick one and document it consistently.
 
 ### Sorting
 
-```
+```http
 # Single field
 GET /orders?sort=-createdAt      # Descending (- prefix)
 GET /orders?sort=status          # Ascending (no prefix)
@@ -316,7 +316,7 @@ The `-` prefix convention (used by JSON:API spec) is compact and common. Documen
 
 Avoid implementing full-text search in your database for large datasets — use dedicated search infrastructure (Elasticsearch, OpenSearch, Typesense, Algolia). Expose it via a `q` or `search` parameter:
 
-```
+```http
 GET /products?q=wireless+headphones&category=electronics
 ```
 
@@ -328,7 +328,7 @@ The `q` parameter convention comes from search engines and is broadly understood
 
 ### Bulk Create Pattern
 
-```
+```http
 POST /users/batch
 {
   "items": [
@@ -371,7 +371,7 @@ HTTP/1.1 207 Multi-Status
 
 When an operation takes more than a few hundred milliseconds, return immediately with `202 Accepted` and a location to poll:
 
-```
+```http
 POST /reports/generate
 { "type": "quarterly_summary", "year": 2024 }
 
@@ -388,7 +388,7 @@ Retry-After: 5
 
 **Polling the operation:**
 
-```
+```http
 GET /operations/op-abc123
 
 {
@@ -402,7 +402,7 @@ GET /operations/op-abc123
 
 **Completion:**
 
-```
+```json
 {
   "operationId": "op-abc123",
   "status": "completed",
@@ -427,7 +427,7 @@ Idempotency keys prevent duplicate operations when clients retry after network f
 
 **Client:** Generate a unique key (UUID v4) per logical operation, include in header:
 
-```
+```http
 POST /charges
 Idempotency-Key: 4d3eee9e-ca56-4ab2-8d01-6e8d1c7a0521
 { "amount": 2000, "currency": "usd", "source": "card_123" }
@@ -467,7 +467,7 @@ CREATE TABLE idempotency_keys (
 
 HTTP content negotiation allows clients and servers to negotiate the format of the response body.
 
-```
+```http
 # Client requests JSON
 GET /orders/123
 Accept: application/json
@@ -541,7 +541,7 @@ Jon Postel's robustness principle: "Be conservative in what you send, be liberal
 
 Allows clients to request only specific fields, reducing payload size and database query overhead:
 
-```
+```http
 GET /users/123?fields=id,email,name
 ```
 
@@ -551,7 +551,7 @@ GET /users/123?fields=id,email,name
 
 **JSON:API standardizes this as `fields[type]=field1,field2`:**
 
-```
+```http
 GET /users/123?fields[users]=id,email,name
 ```
 

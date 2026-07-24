@@ -24,7 +24,7 @@ API observability is the practice of making your API's internal state inferable 
 
 OpenTelemetry (OTel) is the CNCF-graduated standard for instrumentation, replacing vendor-specific agents. Components:
 
-```
+```text
 Your Application
 ├── OTel API (language-specific: otel-api-*)
 │   └── Minimal interface; no implementation
@@ -118,7 +118,7 @@ Auto-instrumentation for Node.js covers Express, Fastify, Hapi, HTTP client, pg,
 
 ### Trace Model
 
-```
+```text
 Trace ID: 7b05aff8-e2c5-4b6a-a9d3-c0f1e2d3b4a5
 
 Order API                    User Service              Payment Service
@@ -155,7 +155,7 @@ Each span contains:
 
 The standard for propagating trace context between services via HTTP headers:
 
-```
+```http
 GET /orders/123 HTTP/1.1
 traceparent: 00-7b05aff8e2c54b6aa9d3c0f1e2d3b4a5-6f84d0d8e4b3a1c9-01
 tracestate: vendor1=value1,vendor2=value2
@@ -257,7 +257,7 @@ db_pool_connections_max 20
 
 OTel defines standard attribute names for HTTP spans. Using conventions enables interoperability with dashboards and tools:
 
-```
+```text
 http.request.method: GET
 url.path: /orders/123
 url.scheme: https

@@ -12,7 +12,7 @@ HTTP caching eliminates redundant work by serving stored responses. A cache hit 
 
 ### Cache-Control Directive Reference
 
-```
+```text
 Cache-Control: public, max-age=3600
                ↑       ↑
                Can cache in shared caches   Expire after 3600s
@@ -43,7 +43,7 @@ Cache-Control: stale-while-revalidate=86400
 
 ETags enable **conditional GETs** — fetch only when content has changed:
 
-```
+```text
 # First request
 GET /products/catalog
 
@@ -133,7 +133,7 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone}/purge_cache" \
 
 **Fixed Window:**
 
-```
+```text
 Window: 0s - 60s:  10 requests allowed
 Window: 60s - 120s: 10 requests allowed
 ```
@@ -222,7 +222,7 @@ Requests enter a queue; processed at a fixed rate. Smooths out bursty traffic in
 
 Always return rate limit metadata so clients can self-regulate:
 
-```
+```http
 HTTP/1.1 200 OK
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 73
@@ -317,7 +317,7 @@ For an 8-core machine with SSDs: `(8 * 2) + 1 = 17` connections. More than this 
 
 Persistent connections avoid TCP/TLS handshake overhead for repeated requests to the same server:
 
-```
+```http
 # HTTP/1.1 defaults to keep-alive:
 Connection: keep-alive
 Keep-Alive: timeout=5, max=1000    # Keep connection for 5s or 1000 requests
@@ -332,7 +332,7 @@ Keep-Alive: timeout=5, max=1000    # Keep connection for 5s or 1000 requests
 
 ## Response Compression
 
-```
+```text
 # Client signals support
 Accept-Encoding: gzip, br, deflate
 
@@ -487,7 +487,7 @@ app.use((req, res, next) => {
 
 Backpressure is a signal from downstream to upstream to slow down:
 
-```
+```text
 Client → API Gateway → Queue → Worker → Database
                           ↑
                     Queue depth = backpressure signal
@@ -542,7 +542,7 @@ SELECT id, email, name FROM users WHERE id = $1
 **Response streaming for large datasets:**
 Instead of loading 100k records into memory and returning them as one JSON array, stream:
 
-```
+```http
 HTTP/1.1 200 OK
 Content-Type: application/x-ndjson   # Newline-delimited JSON
 

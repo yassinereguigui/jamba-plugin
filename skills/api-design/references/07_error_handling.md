@@ -22,7 +22,7 @@ This pattern breaks HTTP caching, monitoring, and alerting. All downstream syste
 
 **Generic 400 for everything:**
 
-```
+```text
 400 → "Bad request" (for validation, business logic, conflicts, missing auth... everything)
 ```
 
@@ -207,7 +207,7 @@ throw new ProblemDetailsError({
 
 The `type` URI should resolve to human-readable documentation. This makes errors self-documenting:
 
-```
+```text
 GET https://api.example.com/problems/insufficient-funds
 
 <html>
@@ -248,7 +248,7 @@ The `code` field enables client-side switch statements without string-matching `
 
 Every response (success and error) should include a correlation ID traceable through your logging system:
 
-```
+```http
 HTTP/1.1 500 Internal Server Error
 X-Correlation-ID: req-7f8a3b2c-...
 
@@ -296,7 +296,7 @@ The correlation ID should be:
 
 When returning 429 (Too Many Requests) or 503 (Service Unavailable), include guidance on when to retry:
 
-```
+```http
 HTTP/1.1 429 Too Many Requests
 Retry-After: 60
 X-RateLimit-Limit: 100
@@ -306,14 +306,14 @@ X-RateLimit-Reset: 1735689600
 
 `Retry-After` accepts either a number of seconds or an HTTP date:
 
-```
+```text
 Retry-After: 120
 Retry-After: Thu, 01 Jan 2026 00:00:00 GMT
 ```
 
 **API documentation should specify backoff behavior:**
 
-```
+```text
 On 429 responses:
 - Read the Retry-After header
 - If absent, wait 60 seconds

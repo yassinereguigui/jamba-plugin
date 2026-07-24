@@ -12,7 +12,7 @@ Webhooks are HTTP callbacks — your server calls the consumer's server when an 
 
 ### Architecture
 
-```
+```text
                     ┌──────────────────────────────────────────────┐
                     │              Your API Service                  │
                     │                                               │
@@ -247,7 +247,7 @@ Stripe uses fat payloads with the full event embedded. GitHub uses thin/fat hybr
 
 When one event needs delivery to thousands of endpoints:
 
-```
+```text
 Event Emitter
      │
      ▼
@@ -268,7 +268,7 @@ SSE is HTTP-based unidirectional streaming — server pushes a sequence of event
 
 ### Protocol
 
-```
+```http
 GET /events HTTP/1.1
 Accept: text/event-stream
 Cache-Control: no-cache
@@ -428,7 +428,7 @@ CloudEvents is a CNCF specification for event envelope format — a common struc
 
 **Polling is underrated:** For low-frequency updates (check once per minute), polling is dramatically simpler than webhooks or long-polling. Add a `Last-Modified` or `ETag` header for efficient polling — the response will be 304 Not Modified with no body most of the time.
 
-```
+```http
 GET /user/notifications?since=1735689600
 
 HTTP/1.1 200 OK

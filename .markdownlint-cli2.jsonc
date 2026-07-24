@@ -7,7 +7,6 @@
   "ignores": [
     "node_modules/**",
     ".git/**",
-    "skills/api-design/**",        // ratchet: migrating (formatting done, code languages pending)
     "skills/continuous-delivery/**" // ratchet: migrating (needs code-fencing first)
   ],
   "config": {

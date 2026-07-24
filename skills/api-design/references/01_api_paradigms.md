@@ -106,7 +106,7 @@ query {
 
 The most significant production hazard in GraphQL. When resolving a list of entities, each entity's sub-fields trigger individual resolver calls:
 
-```
+```graphql
 query { posts { title author { name } } }
 ```
 
@@ -129,7 +129,7 @@ GraphQL Federation allows a single GraphQL endpoint (the supergraph) to be backe
 
 **Architecture:**
 
-```
+```text
                     ┌──────────────┐
 Client ──────────── │ Apollo Router │ ──── Users Subgraph
                     │  (Supergraph) │ ──── Products Subgraph
@@ -152,7 +152,7 @@ Instead of sending the full query document on every request, clients register qu
 - **Performance:** Smaller payloads, HTTP GET caching becomes possible
 - **Schema evolution:** Server knows exactly what queries exist in production
 
-```
+```http
 POST /graphql HTTP/1.1
 { "extensions": { "persistedQuery": { "version": 1, "sha256Hash": "abc123..." } } }
 ```
@@ -296,7 +296,7 @@ Use case: expose an internal gRPC API externally as REST for browser clients or 
 
 WebSocket (RFC 6455) provides full-duplex communication over a single TCP connection. The handshake upgrades HTTP:
 
-```
+```http
 GET /ws HTTP/1.1
 Upgrade: websocket
 Connection: Upgrade
@@ -331,7 +331,7 @@ Pattern 2 (first-message auth) is the most common production approach.
 
 ### Scaling WebSockets
 
-```
+```text
                     ┌─────────────────┐
 Client A ─── WS ─── │  Server 1       │
 Client B ─── WS ─── │  Server 1       │ ──── Redis Pub/Sub
@@ -348,7 +348,7 @@ When Server 1 receives an event for Client C, it publishes to Redis; Server 2 re
 
 SSE provides unidirectional server-to-client streaming over a persistent HTTP connection. Simpler than WebSockets for push-only use cases.
 
-```
+```http
 GET /events HTTP/1.1
 Accept: text/event-stream
 
@@ -454,7 +454,7 @@ If you encounter SOAP in a new project, it's almost certainly for integration wi
 
 OData (Open Data Protocol) is an OASIS standard for REST APIs with a standardized query language:
 
-```
+```http
 GET /api/Products?$filter=Price lt 10.00&$orderby=Name&$select=Name,Price&$top=5
 ```
 
@@ -490,7 +490,7 @@ HTTP/3 uses QUIC (UDP-based) instead of TCP:
 
 An API mesh (distinct from GraphQL federation) is an architectural approach where multiple APIs are composed into a unified access layer:
 
-```
+```text
 ┌────────────────────────────────────┐
 │          API Mesh Layer            │
 │  (WunderGraph / Hasura / Tyk)      │
@@ -510,7 +510,7 @@ Tools: WunderGraph (open-source, composes REST+GraphQL+gRPC into a single GraphQ
 
 ## Decision Framework: Choosing an API Paradigm
 
-```
+```text
 Is your API consumed by browsers without a build step?
 ├── Yes → REST or GraphQL (not gRPC without grpc-web + envoy proxy)
 └── No → All options available

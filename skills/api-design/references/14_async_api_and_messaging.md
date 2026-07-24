@@ -29,7 +29,7 @@ Kafka is a distributed log, not a traditional message queue. Key characteristics
 
 **Kafka 4.0 (March 2025):** ZooKeeper dependency removed entirely — KRaft (Kafka's built-in Raft consensus) is now the only coordination mechanism. This simplifies deployment significantly (one fewer distributed system to operate).
 
-```
+```text
 Topic: orders
 ├── Partition 0: [msg1, msg5, msg9, ...]
 ├── Partition 1: [msg2, msg6, msg10, ...]
@@ -54,7 +54,7 @@ A traditional message broker with AMQP. Push-based (server pushes to consumers).
 
 **AMQP concepts:**
 
-```
+```text
 Publisher → Exchange → Binding → Queue → Consumer
               │
               ├── Direct: Route by routing key exactly
@@ -101,7 +101,7 @@ channel.basic_consume(queue='order-processing', on_message_callback=on_message)
 
 **The SNS→SQS fanout pattern:**
 
-```
+```text
 SNS Topic: order-events
 ├── SQS Queue: order-processing
 ├── SQS Queue: fraud-detection
@@ -152,7 +152,7 @@ js.Subscribe("orders.created", func(m *nats.Msg) {
 
 The problem: You update a database row AND publish an event. These are two separate operations — one can fail without the other. Result: data inconsistency.
 
-```
+```text
 // Without outbox — fragile
 db.orders.update({ status: 'shipped' });
 kafka.publish('order.shipped', { orderId });  // Could fail; order updated but event lost
@@ -189,7 +189,7 @@ Long-running business transactions spanning multiple services, with compensation
 
 **Choreography-based Saga (event-driven):**
 
-```
+```text
 Order Service        Inventory Service     Payment Service
      │                     │                     │
      ├─→ OrderCreated       │                     │

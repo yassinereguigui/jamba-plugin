@@ -27,11 +27,11 @@ An enterprise with Claude, GPT, and Gemini agents must write three implementatio
 
 The current spec (November 2025) defines two standard transports:
 
-**1. stdio (standard input/output)**
+#### 1. stdio (standard input/output)
 
 For local, in-process tools. The MCP client spawns the MCP server as a child process and communicates via stdin/stdout:
 
-```
+```text
 MCP Client (e.g., Claude Desktop)
      │
      ├── spawn: node my-mcp-server.js
@@ -47,11 +47,11 @@ Use stdio for:
 - Development tooling
 - Private enterprise tools (no network exposure)
 
-**2. Streamable HTTP**
+#### 2. Streamable HTTP
 
 For remote, network-accessible servers. The MCP client sends HTTP POST requests and optionally receives SSE-streamed responses:
 
-```
+```text
 MCP Client ──── POST /mcp ────→ MCP Server
            ←─── 200 OK (JSON)        or
            ←─── 200 SSE stream ──────
@@ -451,7 +451,7 @@ Remote MCP servers use OAuth 2.1 with PKCE (mandatory as of November 2025 spec):
 
 ### Authorization Flow
 
-```
+```text
 1. MCP Client discovers authorization server
    GET /.well-known/oauth-authorization-server
    OR: https://auth.example.com/.well-known/openid-configuration

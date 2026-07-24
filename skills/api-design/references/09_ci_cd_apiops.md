@@ -25,7 +25,7 @@ The term is most associated with the Microsoft Azure APIOps toolkit and Kong, bu
 
 ### Minimal Viable APIOps Pipeline
 
-```
+```text
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────┐
 │  PR Opens   │────▶│   Lint       │────▶│  Break Check │────▶│  Mock    │
 │  (spec edit)│     │ (Spectral)   │     │ (oasdiff)    │     │ (Prism)  │
@@ -329,7 +329,7 @@ Resources:
 
 The Azure APIOps toolkit synchronizes APIM configuration from a git repository:
 
-```
+```text
 apim-repo/
 ├── apis/
 │   └── orders-api/
@@ -518,7 +518,7 @@ Security checks in CI (before deployment) catch issues early:
 
 **Pipeline placement:**
 
-```
+```text
 PR Gate: Spectral lint → oasdiff breaking change → 42Crunch spec audit
 Staging Gate: ZAP passive scan → Schemathesis → Nuclei templates
 Production Promotion: ZAP active scan results reviewed, can-i-deploy

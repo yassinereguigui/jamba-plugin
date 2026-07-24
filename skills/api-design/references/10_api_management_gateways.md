@@ -97,7 +97,7 @@ deck gateway dump --output-file kong-backup.yaml
 
 Separates the control plane (configuration management, admin API) from data planes (traffic handling) — essential for multi-region deployments:
 
-```
+```text
 Control Plane (management cluster)
 ├── Kong Manager (UI)
 ├── Admin API
@@ -194,7 +194,7 @@ APIM is Microsoft's full lifecycle API management platform. It sits between exte
 
 ### APIM Architecture
 
-```
+```text
 External Consumer → API Management Service → Backend APIs
                          ↑
                     XML Policy Pipeline
@@ -441,7 +441,7 @@ Options:
 
 ### Latency Optimization
 
-```
+```text
 User (Tokyo) → Cloudflare Edge (Tokyo) → Cache hit
                                         ↓ Cache miss
                                         → API Gateway (AP-Northeast-1)

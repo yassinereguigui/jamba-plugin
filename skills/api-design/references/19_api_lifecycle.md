@@ -8,7 +8,7 @@ The API lifecycle spans from ideation to retirement — not just development and
 
 ## API Lifecycle Stages
 
-```
+```text
 Ideation → Design → Build → Test → Deploy → Operate → Evolve → Deprecate → Retire
     │           │        │       │        │         │         │           │
     │      Design Review  │      CI/CD    Monitoring│   Version bump  Sunset header

@@ -16,7 +16,7 @@ The 2023 edition reorganized and expanded the 2019 list. Notable changes: BOLA (
 
 **Real-world example pattern:**
 
-```
+```http
 GET /api/invoices/12345
 Authorization: Bearer <user_A_token>
 ```
@@ -169,7 +169,7 @@ PATCH /users/me
 
 **Classic attack:**
 
-```
+```http
 POST /api/webhooks
 { "url": "http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name" }
 ```
@@ -216,7 +216,7 @@ app.use(cors({
 
 **Missing security headers:**
 
-```
+```text
 # Required headers
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 X-Content-Type-Options: nosniff
@@ -325,7 +325,7 @@ Browser makes a preflight `OPTIONS` request before actual requests with:
 - Non-simple methods (PUT, DELETE, PATCH)
 - `Content-Type: application/json`
 
-```
+```http
 OPTIONS /api/orders HTTP/1.1
 Origin: https://app.example.com
 Access-Control-Request-Method: POST
@@ -334,7 +334,7 @@ Access-Control-Request-Headers: Content-Type, Authorization
 
 Server must respond:
 
-```
+```http
 HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://app.example.com
 Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH
@@ -385,7 +385,7 @@ API keys are the simplest API authentication mechanism. Used correctly:
 
 **Format:** Prefix + random bytes. Prefix enables identification without exposing the key:
 
-```
+```text
 sk_live_4K8mX9P2nQ7rV3wY1hE6   # Stripe-style
 pk_live_...                      # Stripe publishable key (different prefix = different permissions)
 ```
@@ -490,7 +490,7 @@ Rate limiting is discussed in depth in `12_performance_scaling.md`, but it serve
 
 **Security-specific rate limit examples:**
 
-```
+```http
 POST /auth/login:         5 attempts/minute per IP, 10 per account per hour
 POST /auth/reset-password: 3 attempts/hour per email address
 GET /users?email=:        100 requests/minute (enumeration risk)

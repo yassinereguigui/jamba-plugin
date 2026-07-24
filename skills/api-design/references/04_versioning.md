@@ -55,7 +55,7 @@ Existing clients break without modification:
 
 ### 1. URI Path Versioning
 
-```
+```text
 /v1/users
 /v2/users
 /v3/users
@@ -82,7 +82,7 @@ Existing clients break without modification:
 
 ### 2. Request Header Versioning
 
-```
+```http
 GET /users/123
 Api-Version: 2024-01-01
 ```
@@ -106,7 +106,7 @@ Api-Version: 2024-01-01
 
 ### 3. Content Negotiation (Accept Header)
 
-```
+```http
 GET /users/123
 Accept: application/vnd.example.v2+json
 ```
@@ -129,7 +129,7 @@ Accept: application/vnd.example.v2+json
 
 ### 4. Query Parameter Versioning
 
-```
+```http
 GET /users/123?version=2
 GET /users/123?api-version=2024-01-01
 ```
@@ -187,7 +187,7 @@ This works if you can commit to it. Most teams cannot — they accumulate design
 
 ### Sunset Header (RFC 8594)
 
-```
+```http
 HTTP/1.1 200 OK
 Sunset: Sun, 31 Dec 2024 23:59:59 GMT
 Deprecation: Thu, 01 Jun 2023 00:00:00 GMT

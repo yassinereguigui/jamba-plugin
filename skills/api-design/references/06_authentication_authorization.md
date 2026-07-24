@@ -14,7 +14,7 @@ For any flow where a user delegates access to a third-party application. PKCE (P
 
 **Full flow:**
 
-```
+```text
 1. App generates code_verifier (random 43-128 char string)
 2. App computes code_challenge = BASE64URL(SHA256(code_verifier))
 3. Redirect to authorization endpoint:
@@ -56,7 +56,7 @@ For any flow where a user delegates access to a third-party application. PKCE (P
 
 For server-to-server communication where no user is involved:
 
-```
+```http
 POST /token
 grant_type=client_credentials&
 client_id=service-a&
@@ -79,7 +79,7 @@ Use this for:
 
 **Client secret alternatives:** For higher security M2M auth, use client assertion (JWT signed with private key) instead of a static client secret:
 
-```
+```text
 client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&
 client_assertion=<signed_jwt>
 ```
@@ -88,7 +88,7 @@ client_assertion=<signed_jwt>
 
 For devices with limited input (smart TVs, IoT, CLI tools):
 
-```
+```text
 1. Device POSTs to /device/authorize
    Response: { "device_code": "...", "user_code": "WDJB-MJHT", 
                "verification_uri": "https://auth.example.com/device",
@@ -172,7 +172,7 @@ OIDC is an identity layer on top of OAuth 2.0. It adds a standardized way to get
 
 **OIDC discovery:**
 
-```
+```text
 GET https://auth.example.com/.well-known/openid-configuration
 
 {
@@ -229,7 +229,7 @@ APIs should use the `jwks_uri` to fetch public keys dynamically rather than hard
 
 The API receives an opaque token and calls the auth server to validate it:
 
-```
+```http
 POST /token/introspect
 Authorization: Basic <api-credentials>
 token=access_token_value
@@ -279,7 +279,7 @@ The security best practice (required in OAuth 2.1):
 
 **Refresh token reuse detection:** If the old refresh token is presented again (attacker stole it and is racing), the auth server detects this and invalidates the *entire token family* (all tokens issued from that original grant). This signals a security event — log it and alert.
 
-```
+```text
 POST /token
 grant_type=refresh_token&
 refresh_token=old_refresh_token_here
@@ -307,14 +307,14 @@ Response:
 
 **RBAC (Role-Based Access Control):** Users assigned roles; roles have permissions.
 
-```
+```text
 User Alice → Role: "admin"
 Role "admin" → Permission: "orders:delete"
 ```
 
 **ABAC (Attribute-Based Access Control):** Access decisions based on attributes of the user, resource, and environment.
 
-```
+```text
 Policy: ALLOW if
   user.department == resource.department AND
   user.clearance >= resource.sensitivity_level AND
@@ -323,7 +323,7 @@ Policy: ALLOW if
 
 **ReBAC (Relationship-Based Access Control):** Access based on a graph of relationships between entities.
 
-```
+```text
 Alice is editor of Document D
 Alice's team is owner of Project P
 Document D is in Project P
@@ -370,7 +370,7 @@ allow {
 
 OPA evaluates policies at microsecond speeds when running as a sidecar. Integration:
 
-```
+```text
 POST http://localhost:8181/v1/data/api/authorization/allow
 {
   "input": {
@@ -414,7 +414,7 @@ Cerbos runs as a sidecar or embedded SDK, evaluating policies with sub-milliseco
 
 Google's Zanzibar (2019 paper) defines a globally consistent, low-latency authorization system storing tuples:
 
-```
+```text
 (object, relation, user)
 document:doc-123#viewer@user:alice
 document:doc-123#editor@user:bob
@@ -443,7 +443,7 @@ A check: "Can Alice view doc-123?" traverses the graph:
 
 **Scopes:** OAuth mechanism for coarse-grained consent. Represent categories of access.
 
-```
+```text
 orders:read    — Can read order data
 orders:write   — Can create/modify orders
 admin:*        — Full admin access
@@ -544,7 +544,7 @@ For APIs serving thousands of developers with API keys:
 
 **Key lifecycle:**
 
-```
+```text
 Generate → Distribute (once, in plaintext) → Store (hashed) → Use → Rotate → Revoke
 ```
 

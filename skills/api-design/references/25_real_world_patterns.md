@@ -57,7 +57,7 @@ Stripe requires idempotency keys for all POST requests:
 
 Instead of making multiple API calls to retrieve related resources, Stripe allows expanding nested objects:
 
-```
+```http
 GET /charges/ch_123?expand[]=customer&expand[]=invoice.subscription
 
 Response includes full Customer and Subscription objects inline.
@@ -81,7 +81,7 @@ Each Stripe account is pinned to the API version when it was created. Stripe rel
 
 Twilio transformed telephony (traditionally accessed via hardware and vendor-specific protocols) into REST resources. A phone number is `/IncomingPhoneNumbers`, a call is `/Calls`, an SMS is `/Messages`.
 
-```
+```http
 POST /2010-04-01/Accounts/{AccountSid}/Messages.json
 {
   "To": "+15551234567",
@@ -133,7 +133,7 @@ Both APIs cover the same underlying data. GitHub maintains both because each sty
 
 GitHub Apps request specific permissions at installation rather than receiving all-or-nothing personal token access:
 
-```
+```text
 Installation permissions:
 - contents: read
 - pull_requests: write
@@ -223,7 +223,7 @@ AWS uses `Verb + Noun` naming for all API actions:
 
 AWS authenticates API calls via HMAC-based request signing (Signature Version 4):
 
-```
+```text
 HMAC-SHA256(
   "AWS4" + secret_key,
   date + region + service + "aws4_request"

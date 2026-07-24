@@ -118,7 +118,7 @@ Multiple named examples (not just `example`) are the most underused OpenAPI feat
 
 The official web-based editor and documentation previewer for AsyncAPI specs:
 
-```
+```text
 https://studio.asyncapi.com/?url=https://my-api.com/asyncapi.yaml
 ```
 
@@ -156,7 +156,7 @@ Documentation stored in version control, reviewed via PRs, deployed via CI/CD.
 
 **Structure:**
 
-```
+```text
 docs/
 ├── openapi.yaml              # API spec (docs source of truth)
 ├── guides/                   # Conceptual documentation
@@ -186,7 +186,7 @@ Reference documentation answers "what?" Conceptual documentation answers "how?" 
 
 ### Documentation Types Hierarchy
 
-```
+```text
 1. Tutorials (learning-oriented)
    "Send your first message in 5 minutes"
    → Goal: newcomer gets a win quickly

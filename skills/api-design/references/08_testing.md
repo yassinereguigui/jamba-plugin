@@ -8,7 +8,7 @@ API testing covers a wide spectrum: from unit tests of request handlers to distr
 
 ## Testing Scope and Layers
 
-```
+```text
                         ↑ Cost / Confidence / Scope
 Chaos Engineering       │ ●
 E2E API Tests           │ ●●

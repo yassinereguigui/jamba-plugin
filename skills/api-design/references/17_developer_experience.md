@@ -24,7 +24,7 @@ Stripe is the canonical example of excellent DX. Developers can make their first
 
 ### The Critical Path
 
-```
+```text
 Discovery → Signup → Get API key → First successful call → First integration → Production
      │           │           │               │                   │
      DX starts   DX 1st      DX biggest      "Aha!" moment       Long-term retention
