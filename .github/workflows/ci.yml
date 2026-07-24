@@ -28,6 +28,7 @@ jobs:
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
 
-      # Structural validation is offline and needs no credentials.
-      - name: Validate plugin
-        run: make validate
+      # Deterministic gate: structural validation (offline, no credentials)
+      # plus JSON validity. Grows as checks are added.
+      - name: Run gate
+        run: make check
